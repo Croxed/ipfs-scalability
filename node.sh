@@ -9,13 +9,11 @@ touch $STATS_FILE
 sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
 SPEED="125M"    # Limit network speed for cURL
-NODES=(10 30 50)
+NODES=(10)
 for node in "${NODES[@]}"; do
-    iptb init -n "$node" --bootstrap none -f
+    comcast --stop
     
-    export IPFS_PATH="$HOME/testbed/0"
-    ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080;
-    unset IPFS_PATH
+    iptb init -n "$node" --bootstrap none -f
     
     iptb start
     export IPFS_PATH="$HOME/testbed/0"
@@ -33,21 +31,29 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/$(($node - 1))"
     ipfs add -r "$DIR/files"
     unset IPFS_PATH
-
+    
+    comcast --device=lo0 --latency=50 --target-bw=1000000 --packet-loss=2%
+    export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="song.mp3"
     ITERATIONS=40
+    IPFS_FILE_SIZE="$(ipfs files stat /ipfs/QmRQrVc93rq5JCGH4kPnxSBt8HbMbXQrEpkdP1dkiTfC6M/song.mp3 | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        curl --limit-rate "$SPEED" -sSn "$HOST/$IPFS_HASH/$IPFS_FILE" -o /dev/null -w "%{time_total},%{size_download}," >> $STATS_FILE
-        echo "$IPFS_FILE,$node" >> $STATS_FILE
+        start_time="$(date +%s%3N | sed 's/N$//')"
+        ipfs get "$IPFS_HASH/$IPFS_FILE" -o /dev/null
+        end_time="$(date +%s%3N | sed 's/N$//')"
+        milli_time="$(($end_time - $start_time))"
+        time_secs=$(echo "scale=2;${milli_time}/1000" | bc)
+        echo "$time_secs,$IPFS_FILE_SIZE,$IPFS_FILE,$node" >> $STATS_FILE
     done
 
     # ITERATIONS=15
     # IPFS_FILE="film.mp4"
     # for (( i = 0; i < "$ITERATIONS"; i++ )); do
-    #     curl --limit-rate "$SPEED" -sSn "$HOST/$IPFS_HASH/$IPFS_FILE" -o /dev/null -w "%{time_total},%{size_download}," >> $STATS_FILE
+    #     curl --limit-rate "$SPEED" -sSn "$HOST/$IPFS_HASH/$IPFS_FILE" -o /dev/null -w "%{time_total},%{size_download},%{speed_download}," >> $STATS_FILE
     #     echo "$IPFS_FILE,$node" >> $STATS_FILE
     # done
-
+    comcast --stop
+    unset IPFS_PATH
     iptb stop
 done
 python3 "$DIR/graph_builder/grapher.py" "$DIR/stats.csv"
