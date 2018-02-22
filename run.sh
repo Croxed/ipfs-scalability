@@ -43,7 +43,7 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     
-    export IPFS_PATH="$HOME/testbed/$node - 1"
+    export IPFS_PATH="$HOME/testbed/$(($node - 1))"
     ipfs add -r "$DIR/files"
     unset IPFS_PATH
     
