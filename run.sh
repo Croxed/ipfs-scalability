@@ -15,6 +15,9 @@ for node in "${NODES[@]}"; do
     
     iptb init -n "$node" --bootstrap none -f
     trickled 
+    export IPFS_PATH="$HOME/testbed/0"
+    ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
+    unset IPFS_PATH
     # iptb start --wait
     for (( i = 0; i < "$node"; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
