@@ -48,7 +48,7 @@ for node in "${NODES[@]}"; do
     Comcast --device=lo --latency=50
     
     export IPFS_PATH="$HOME/testbed/0"
-    IPFS_FILE="go.src"
+    IPFS_FILE="$(find "$DIR" -maxdepth 0 -type d)"
     rm -rf "$DIR/downloaded"
     ITERATIONS=40
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
