@@ -40,9 +40,9 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     
-    for (( i = (($node - 3)); i < "$node"; i++ )); do
+    for (( i = 1; i < $node -1; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        ipfs add -r "$DIR/files" &> /dev/null
+        ipfs pin add -r "/ipfs/$IPFS_HASH" &> /dev/null
         unset IPFS_PATH
     done
 
