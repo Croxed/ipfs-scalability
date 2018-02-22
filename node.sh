@@ -8,6 +8,7 @@ STATS_FILE="stats.csv"
 touch $STATS_FILE
 sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
+ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
 NODES=(10)
@@ -50,7 +51,6 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find "$DIR" -maxdepth 0 -type d)"
     rm -rf "$DIR/downloaded"
-    ITERATIONS=40
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
         start_time="$(date +%s%3N | sed 's/N$//')"
@@ -70,4 +70,3 @@ for node in "${NODES[@]}"; do
     Comcast --stop
     # iptb stop
 done
-python36 "$DIR/graph_builder/grapher.py" "$DIR/stats.csv"
