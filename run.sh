@@ -12,7 +12,7 @@ SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
 NODES=(10)
 for node in "${NODES[@]}"; do
-    Comcast --stop
+    Comcast --device=lo --stop
     
     iptb init -n "$node" --bootstrap none -f
     trickled 
@@ -22,7 +22,7 @@ for node in "${NODES[@]}"; do
     # iptb start --wait
     for (( i = 0; i < "$node"; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        trickle -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
+        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
         unset IPFS_PATH
     done
@@ -70,6 +70,6 @@ for node in "${NODES[@]}"; do
     pkill ipfs
     pkill trickle
     pkill trickled
-    Comcast --stop
+    Comcast --device=lo --stop
     # iptb stop
 done
