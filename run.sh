@@ -10,7 +10,7 @@ sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
-NODES=(10)
+NODES=(10 50 100)
 for node in "${NODES[@]}"; do
     Comcast --device=lo --stop
     
@@ -43,10 +43,6 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     
-    # export IPFS_PATH="$HOME/testbed/$(($node - 1))"
-    # ipfs add -r "$DIR/files"
-    # unset IPFS_PATH
-    
     for (( i = 1; i < $node; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs add -r "$DIR/files" &> /dev/null; echo "Node: $(ipfs id -f \"\<id\>\") added files"
@@ -56,11 +52,11 @@ for node in "${NODES[@]}"; do
     Comcast --device=lo --latency=50
     
     export IPFS_PATH="$HOME/testbed/0"
-    IPFS_FILE="go.src"
+    IPFS_FILE="$(find $DIR/files -maxdepth 0 -type d)"
     rm -rf "$DIR/downloaded"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        curl --limit-rate "$SPEED" -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total},%{size_download}," >> $STATS_FILE
+        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" curl -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total},%{size_download}," >> $STATS_FILE
         echo "$IPFS_FILE,$node" >> $STATS_FILE
         ipfs repo gc &> /dev/null
         rm -rf "$DIR/downloaded"
