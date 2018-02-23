@@ -45,14 +45,15 @@ for node in "${NODES[@]}"; do
     
     for (( i = 1; i < $node; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        ipfs add -r "$DIR/files" &> /dev/null; echo "Node: $(ipfs id -f \"\<id\>\") added files"
+        ipfs add -r "$DIR/files" &> /dev/null; echo "Node: $(ipfs id -f \"\<id\>\") added files" &
         unset IPFS_PATH
     done
+    wait
 
     Comcast --device=lo --latency=50
     
     export IPFS_PATH="$HOME/testbed/0"
-    IPFS_FILE="$(find $DIR/files -maxdepth 0 -type d)"
+    IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     rm -rf "$DIR/downloaded"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
