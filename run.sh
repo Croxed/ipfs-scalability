@@ -45,8 +45,9 @@ for node in "${NODES[@]}"; do
     
     for (( i = 1; i < $node; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        ipfs add -r "$DIR/files" &> /dev/null; echo "Node: $(ipfs id -f \"\<id\>\") added files" &
+        ipfs add -r "$DIR/files" &> /dev/null &
         pids+=($!)
+        echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
         unset IPFS_PATH
     done
     wait "${pids[@]}"
