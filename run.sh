@@ -46,9 +46,10 @@ for node in "${NODES[@]}"; do
     for (( i = 1; i < $node; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs add -r "$DIR/files" &> /dev/null; echo "Node: $(ipfs id -f \"\<id\>\") added files" &
+        pids+=($!)
         unset IPFS_PATH
     done
-    wait
+    wait "${pids[@]}"
 
     Comcast --device=lo --latency=50
     
