@@ -49,7 +49,7 @@ for node in "${NODES[@]}"; do
     it=$(((node - 1) % 6))
     for (( i = 1; i < 9; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        files=$(find "$DIR/files/go-ipfs-0.4.13/*" -maxdepth 0 | head -n $((8 * i)))
+        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * i)))
         for file in "${files[@]}"; do
             ipfs add -r "$file" &> /dev/null &
             pids+=($!)
