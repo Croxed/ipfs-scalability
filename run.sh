@@ -55,6 +55,8 @@ for node in "${NODES[@]}"; do
     done
     wait "${pids[@]}"
 
+    echo "Done adding files"
+
     tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
     
     export IPFS_PATH="$HOME/testbed/0"
