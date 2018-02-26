@@ -60,6 +60,8 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/$((node -1))"
     ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null &
     pids+=($!)
+    echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
+    unset IPFS_PATH
     wait "${pids[@]}"
 
     echo "Done adding files"
