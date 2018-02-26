@@ -12,7 +12,7 @@ DELAY=50ms
 ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
-NODES=(10 50 100)
+NODES=(10 20 30)
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
     
@@ -46,10 +46,14 @@ for node in "${NODES[@]}"; do
     done
     
     pids=()
-    for (( i = 1; i < $node; i++ )); do
+    it=$(((node - 1) % 6))
+    for (( i = 1; i < 9; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        ipfs add -r "$DIR/files" &> /dev/null &
-        pids+=($!)
+        files=$(find "$DIR/files/go-ipfs-0.4.13/*" -maxdepth 0 | head -n $((8 * i)))
+        for file in "${files[@]}"; do
+            ipfs add -r "$file" &> /dev/null &
+            pids+=($!)
+        done
         echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
         unset IPFS_PATH
     done
