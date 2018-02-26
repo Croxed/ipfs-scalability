@@ -16,14 +16,31 @@ def set_xaxis_title(bp):
 
 with PdfPages('plot.pdf') as pdf:
     df = pd.read_csv(sys.argv[1], sep=',', na_values=".")
-    uniqueData = np.unique(df['size'])
+    # uniqueData = np.unique(df['nodes'])
+    # for item in uniqueData:
+    #     data = df.query('nodes == @item')
+    plt.figure()
+    bp = df.boxplot(column='time', by='nodes', patch_artist=True)
+    # set_xaxis_title(bp)
+    plt.title(df.iloc[0]['file'] + " (" + size(int(df.iloc[0]['size'])) + ")")
+    plt.xlabel("Nodes")
+    plt.ylabel("Time (s)")
+    plt.suptitle("")
+    pdf.savefig()
+    plt.close()
+
+    uniqueData = np.unique(df['nodes'])
     for item in uniqueData:
-        data = df.query('size == @item')
+        data = df.query('nodes == @item')
         plt.figure()
-        bp = data.boxplot(column='time', by='nodes', patch_artist=True)
+        it = 0
+        for i, row in data.iterrows():
+            data.at[i,'nodes'] = it
+            it += 1
+        bp = data.plot(x='nodes', y='time')
         # set_xaxis_title(bp)
-        plt.title(data.iloc[0]['file'] + " (" + size(int(data.iloc[0]['size'])) + ")")
-        plt.xlabel("Nodes")
+        plt.title("Nodes: " + str(item))
+        plt.xlabel("Iteration")
         plt.ylabel("Time (s)")
         plt.suptitle("")
         pdf.savefig()

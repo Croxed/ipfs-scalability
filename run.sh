@@ -7,12 +7,14 @@ STATS_FILE="stats.csv"
 touch $STATS_FILE
 sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
+DEV=lo
+DELAY=50ms
 ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
 NODES=(10 50 100)
+tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
-    Comcast --device=lo --stop
     
     iptb init -n "$node" --bootstrap none -f
     trickled 
@@ -53,7 +55,7 @@ for node in "${NODES[@]}"; do
     done
     wait "${pids[@]}"
 
-    Comcast --device=lo --latency=50
+    tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
     
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
@@ -70,6 +72,6 @@ for node in "${NODES[@]}"; do
     pkill ipfs
     pkill trickle
     pkill trickled
-    Comcast --device=lo --stop
+    tc qdisc del dev "$DEV" root netem
     # iptb stop
 done
