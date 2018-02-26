@@ -8,12 +8,14 @@ STATS_FILE="stats.csv"
 touch $STATS_FILE
 sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
+DEV=lo
+DELAY=50ms
 ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
-NODES=(10)
+NODES=(10 50 100)
+tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
-    Comcast --device=lo --stop
     
     iptb init -n "$node" --bootstrap none -f
     trickled 
@@ -54,15 +56,15 @@ for node in "${NODES[@]}"; do
     done
     wait "${pids[@]}"
 
-    Comcast --device=lo --latency=50
-    
+    tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
+
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find "$DIR/files/*" -maxdepth 0 -type d -exec basename {} \;)"
     rm -rf "$DIR/downloaded"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
         start_time="$(date +%s%3N | sed 's/N$//')"
-        ipfs get "$IPFS_HASH" -o "$DIR/downloaded"
+        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs get "$IPFS_HASH" -o "$DIR/downloaded"
         end_time="$(date +%s%3N | sed 's/N$//')"
         milli_time="$(($end_time - $start_time))"
         time_secs=$(echo "scale=2;${milli_time}/1000" | bc)
@@ -75,6 +77,6 @@ for node in "${NODES[@]}"; do
     pkill ipfs
     pkill trickle
     pkill trickled
-    Comcast --device=lo --stop
+    tc qdisc del dev "$DEV" root netem 
     # iptb stop
 done

@@ -72,6 +72,5 @@ for node in "${NODES[@]}"; do
     pkill ipfs
     pkill trickle
     pkill trickled
-    tc qdisc del dev "$DEV" root netem
-    # iptb stop
+    tc qdisc del dev "$DEV" root netem # iptb stop
 done
