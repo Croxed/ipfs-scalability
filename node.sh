@@ -19,7 +19,7 @@ for node in "${NODES[@]}"; do
     iptb init -n "$node" --bootstrap none -f
     trickled 
     export IPFS_PATH="$HOME/testbed/0"
-    IPFS_HASH="$(ipfs add -nr go-ipfs-0.4.13 | tail -n 1 | awk '{print $2}')"
+    IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
     unset IPFS_PATH
     # iptb start --wait
     for (( i = 0; i < "$node"; i++ )); do
