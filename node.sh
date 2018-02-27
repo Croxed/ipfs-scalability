@@ -73,7 +73,7 @@ for node in "${NODES[@]}"; do
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
         start_time="$(date +%s%3N | sed 's/N$//')"
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs get "$IPFS_HASH" -o "$DIR/downloaded"
+        ipfs get "$IPFS_HASH" -o "$DIR/downloaded"
         end_time="$(date +%s%3N | sed 's/N$//')"
         milli_time="$(($end_time - $start_time))"
         time_secs=$(echo "scale=2;${milli_time}/1000" | bc)
