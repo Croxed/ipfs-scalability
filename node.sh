@@ -44,10 +44,6 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     
-    export IPFS_PATH="$HOME/testbed/(($node - 1))"
-    ipfs add -r "$DIR/files"
-    unset IPFS_PATH
-
     pids=()
     it=$(((node - 1) % 6))
     for (( i = 1; i < 9; i++ )); do
@@ -70,7 +66,7 @@ for node in "${NODES[@]}"; do
     echo "Done adding files"
 
     tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
-
+    
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     rm -rf "$DIR/downloaded"
