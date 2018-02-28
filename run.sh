@@ -29,9 +29,9 @@ for node in "${NODES[@]}"; do
         echo $! > "$IPFS_PATH/daemon.pid"
         unset IPFS_PATH
     done
-    STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/API server/{print $5}' | wc -l)"
+    STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
     while((STARTED > node)); do
-        STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/API server/{print $5}' | wc -l)"
+        STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
         sleep 2
     done
     export IPFS_PATH="$HOME/testbed/0"
