@@ -4,6 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 HOST="http://localhost:8080/ipfs"
 IPFS_HASH="QmUtyrtpwXy7fq6pu6rFQijNcmZaY6XeR2n3oThu2XjBEQ"
 STATS_FILE="stats.csv"
+head -n 1 "$DIR/template" > "$DIR/$STATS_FILE"
 touch $STATS_FILE
 sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
