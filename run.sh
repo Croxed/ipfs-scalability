@@ -52,9 +52,9 @@ for node in "${NODES[@]}"; do
     
     pids=()
     it=$(((node - 1) % 6))
-    for (( i = 1; i < 9; i++ )); do
+    for (( i = 1; i < nodes - 1; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * i)))
+        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * (i % 8))))
         for file in "${files[@]}"; do
             ipfs add -r "$file" &> /dev/null &
             pids+=($!)
@@ -75,13 +75,11 @@ for node in "${NODES[@]}"; do
     
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
-    rm -rf "$DIR/downloaded"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" curl -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total},%{size_download}," >> $STATS_FILE
-        echo "$IPFS_FILE,$node" >> $STATS_FILE
+        curl_data="$(trickle -s -u "$KBITSPEED" -d "$KBITSPEED" curl -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total}")"
+        echo "$curl_data,$IPFS_FILE_SIZE,$IPFS_FILE,$node" >> $STATS_FILE
         ipfs repo gc &> /dev/null
-        rm -rf "$DIR/downloaded"
     done
 
     unset IPFS_PATH

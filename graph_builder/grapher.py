@@ -19,29 +19,29 @@ with PdfPages('plot.pdf') as pdf:
     df = pd.read_csv(sys.argv[1], sep=',', na_values=".")
     plt.figure()
     bp = df.boxplot(column='time', by='nodes', patch_artist=True, showfliers=False)
-    plt.title(df.iloc[0]['file'] + " (" + size(int(df.iloc[0]['size'])) + ")")
+    plt.title(df.iloc[0]['file'])
     plt.xlabel("Nodes")
     plt.ylabel("Time (s)")
     plt.suptitle("")
     pdf.savefig()
     plt.close()
 
-    uniqueData = np.unique(df['nodes'])
-    for item in uniqueData:
-        data = df.query('nodes == @item')
-        plt.figure()
-        it = 0
-        for i, row in data.iterrows():
-            data.at[i,'nodes'] = it
-            it += 1
-        bp = data.plot(x='nodes', y='time')
-        # set_xaxis_title(bp)
-        plt.title("Nodes: " + str(item))
-        plt.xlabel("Iteration")
-        plt.ylabel("Time (s)")
-        plt.suptitle("")
-        pdf.savefig()
-        plt.close()
+    # uniqueData = np.unique(df['nodes'])
+    # for item in uniqueData:
+    #     data = df.query('nodes == @item')
+    #     plt.figure()
+    #     it = 0
+    #     for i, row in data.iterrows():
+    #         data.at[i,'nodes'] = it
+    #         it += 1
+    #     bp = data.plot(x='nodes', y='time')
+    #     # set_xaxis_title(bp)
+    #     plt.title("Nodes: " + str(item))
+    #     plt.xlabel("Iteration")
+    #     plt.ylabel("Time (s)")
+    #     plt.suptitle("")
+    #     pdf.savefig()
+    #     plt.close()
 
     # We can also set the file's metadata via the PdfPages object:
     d = pdf.infodict()
