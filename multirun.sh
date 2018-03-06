@@ -30,7 +30,7 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     # iptb start --wait
-    for (( i = 0; i < "$node"; i++ )); do
+    for (( i = 0; i < node + CLIENTS; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
