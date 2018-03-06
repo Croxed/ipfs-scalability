@@ -2,6 +2,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 HOST="http://localhost:8080/ipfs"
+API="http://localhost:5001/api/v0"
 IPFS_HASH="QmUtyrtpwXy7fq6pu6rFQijNcmZaY6XeR2n3oThu2XjBEQ"
 STATS_FILE="stats.csv"
 head -n 1 "$DIR/template" > "$DIR/$STATS_FILE"
@@ -82,7 +83,7 @@ for node in "${NODES[@]}"; do
     CLIENTS=10
     {
     for (( i = 0; i < "$CLIENTS"; i++ )); do
-        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS &
+        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $API &
         pids+=($!)
     done
     } >> "$DIR/stats.csv"

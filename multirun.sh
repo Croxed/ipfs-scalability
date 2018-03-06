@@ -14,7 +14,8 @@ SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
 NODES=(10 20 30)
 CLIENTS=10
-PORT=8080
+WEBPORT=8080
+APIPORT=5001
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
 
@@ -25,8 +26,10 @@ for node in "${NODES[@]}"; do
     unset IPFS_PATH
     for (( i = 0; i < CLIENTS; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$PORT"
-        ((PORT++))
+        ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$WEBPORT"
+        ipfs config Addresses.API /ip4/0.0.0.0/tcp/APIPORT
+        ((WEBPORT++))
+        ((APIPORT++))
         unset IPFS_PATH
     done
     # iptb start --wait
@@ -84,14 +87,17 @@ for node in "${NODES[@]}"; do
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     pids=()
-    PORT=8080
+    WEBPORT=8080
+    APIPORT=5001
     ITERATIONS=30
     {
     for (( i = 0; i < "$CLIENTS"; i++ )); do
-        HOST="http://localhost:$PORT/ipfs"
-        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS &
+        HOST="http://localhost:$WEBPORT/ipfs"
+        API="http://localhost:$APIPORT/api/v0"
+        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $API &
         pids+=($!)
-        ((PORT++))
+        ((WEBPORT++))
+        ((APIPORT++))
     done
     } >> "$DIR/stats.csv"
     wait "${pids[@]}"
