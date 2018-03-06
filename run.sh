@@ -80,7 +80,7 @@ for node in "${NODES[@]}"; do
     ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }'
     {
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        bash "$DIR/download.sh $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node" &
+        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node &
     done
     } > "$DIR/stats.csv"
     unset IPFS_PATH
