@@ -78,12 +78,14 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
-    ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }'
+    pids=()
     {
     for (( i = 0; i < "$ITERATIONS"; i++ )); do
         bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node &
+        pids+=($!)
     done
     } > "$DIR/stats.csv"
+    wait "${pids[@]}"
     unset IPFS_PATH
     pkill ipfs
     pkill trickle
