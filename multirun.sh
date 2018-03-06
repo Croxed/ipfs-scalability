@@ -18,7 +18,7 @@ PORT=8080
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
 
-    iptb init -n "$((node - CLIENTS))" --bootstrap none -f
+    iptb init -n "$((node + CLIENTS))" --bootstrap none -f
     trickled 
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
