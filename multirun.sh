@@ -27,7 +27,7 @@ for node in "${NODES[@]}"; do
     for (( i = 0; i < CLIENTS; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$WEBPORT"
-        ipfs config Addresses.API /ip4/0.0.0.0/tcp/APIPORT
+        ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$APIPORT"
         ((WEBPORT++))
         ((APIPORT++))
         unset IPFS_PATH
