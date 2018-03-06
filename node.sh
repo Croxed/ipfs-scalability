@@ -51,13 +51,14 @@ for node in "${NODES[@]}"; do
     
     pids=()
     it=$(((node - 1) % 6))
-    for (( i = 1; i < nodes - 1; i++ )); do
+    for (( i = 1; i < node / 6; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
-        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * (i % 8))))
+        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * it)))
         for file in "${files[@]}"; do
             ipfs add -r "$file" &> /dev/null &
             pids+=($!)
         done
+        ((it++))
         echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
         unset IPFS_PATH
     done
@@ -74,20 +75,17 @@ for node in "${NODES[@]}"; do
     
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
-    rm -rf "$DIR/downloaded"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
-    for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        start_time="$(date +%s%3N | sed 's/N$//')"
-        ipfs get "$IPFS_HASH" -o "$DIR/downloaded"
-        end_time="$(date +%s%3N | sed 's/N$//')"
-        milli_time="$(($end_time - $start_time))"
-        time_secs=$(echo "scale=2;${milli_time}/1000" | bc)
-        echo "$time_secs,$IPFS_FILE_SIZE,$IPFS_FILE,$node" >> $STATS_FILE
-        ipfs repo gc &> /dev/null
-        rm -rf "$DIR/downloaded"
-    done
-
     unset IPFS_PATH
+    DOWNLOADERS=10
+    pids=()
+    {
+    for (( i = 0; i < "$DOWNLOADERS"; i++ )); do
+        bash "$DIR/nodeDownload.sh" $i $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS &
+        pids+=($!)
+    done
+    } >> "$DIR/stats.csv"
+    wait "${pids[@]}"
     pkill ipfs
     pkill trickle
     pkill trickled
