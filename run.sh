@@ -10,7 +10,6 @@ sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 
 DEV=lo
 DELAY=50ms
-ITERATIONS=300
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=1048576 # 1Gbit in Kbit
 NODES=(10 20 30)
@@ -79,9 +78,11 @@ for node in "${NODES[@]}"; do
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
     pids=()
+    ITERATIONS=30
+    CLIENTS=10
     {
-    for (( i = 0; i < "$ITERATIONS"; i++ )); do
-        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node &
+    for (( i = 0; i < "$CLIENTS"; i++ )); do
+        bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS &
         pids+=($!)
     done
     } >> "$DIR/stats.csv"
