@@ -22,6 +22,7 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
     ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
+    ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001
     unset IPFS_PATH
     # iptb start --wait
     for (( i = 0; i < "$node"; i++ )); do
