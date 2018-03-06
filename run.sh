@@ -84,7 +84,7 @@ for node in "${NODES[@]}"; do
         bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node &
         pids+=($!)
     done
-    } > "$DIR/stats.csv"
+    } >> "$DIR/stats.csv"
     wait "${pids[@]}"
     unset IPFS_PATH
     pkill ipfs
