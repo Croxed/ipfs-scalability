@@ -36,6 +36,7 @@ for node in "${NODES[@]}"; do
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
+        echo "Starting node $i"
         unset IPFS_PATH
     done
     STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
