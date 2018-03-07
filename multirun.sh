@@ -23,7 +23,6 @@ for node in "${NODES[@]}"; do
     export IPFS_PATH="$HOME/testbed/0"
     IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
     unset IPFS_PATH
-    echo "$IPFS_HASH"
     for (( i = 0; i < client; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$((WEBPORT + i))"
@@ -37,14 +36,14 @@ for node in "${NODES[@]}"; do
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
-        echo "Starting client $i"
         unset IPFS_PATH
     done
     STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
-    while((STARTED > node)); do
+    while((STARTED > (node + client))); do
         STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
         sleep 2
     done
+    echo "Done starting daemons"
     export IPFS_PATH="$HOME/testbed/0"
     NODE_0_ADDR="$(ipfs id -f \"\<addrs\>\" | head -n 1 | cut -c 2-)"
     unset IPFS_PATH
