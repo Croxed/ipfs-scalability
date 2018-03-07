@@ -30,19 +30,25 @@ for node in "${NODES[@]}"; do
         ipfs config Datastore.GCPeriod 0h
         unset IPFS_PATH
     done
-    # iptb start --wait
+    APILIST=()
     for (( i = 0; i < node + client; i++ )); do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
+        APILIST+=$((APIPORT + i))
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
         echo "Starting node $i"
         unset IPFS_PATH
     done
-    STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
+    STARTED=0
     while((STARTED > (node + client))); do
         STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
-        sleep 2
+        for requsts in "${APILIST[@]}"; do
+            if ! curl -s "http://localhost:$request"; then
+                ((started++))
+            fi
+        done
+        sleep 1
     done
     echo "Done starting daemons"
     export IPFS_PATH="$HOME/testbed/0"
