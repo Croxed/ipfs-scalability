@@ -11,7 +11,7 @@ sed -i "1s/.*/time,size,file,nodes/" "$STATS_FILE"
 DEV=lo
 DELAY=50ms
 SPEED="125M"    # Limit network speed for cURL
-KBITSPEED=1048576 # 1Gbit in Kbit
+KBITSPEED=110240 # 1Gbit in Kbit
 NODES=(10 20 30)
 CLIENTS=10
 tc qdisc del dev "$DEV" root netem
