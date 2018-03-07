@@ -57,7 +57,7 @@ for node in "${NODES[@]}"; do
     done
 
     pids=()
-    replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / client)))"
+    replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / (client + 1))))"
     it=$(((node - 1) % 6))
     echo "$replicas"
     for replica in "${replicas[@]}"; do
