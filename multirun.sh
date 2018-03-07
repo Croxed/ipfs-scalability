@@ -13,7 +13,6 @@ DELAY=50ms
 SPEED="125M"    # Limit network speed for cURL
 KBITSPEED=10240 # 1Gbit in Kbit
 NODES=(50 60 70)
-CLIENT_IT=(1 5 10)
 client=10
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
