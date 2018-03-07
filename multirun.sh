@@ -51,7 +51,6 @@ for node in "${NODES[@]}"; do
 
     for (( i = 1; i < node + client; i++ )); do
         API="http://localhost:$((APIPORT + i))/api/v0"
-        echo "$API"
         curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}"
         curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}"
     done
@@ -59,6 +58,7 @@ for node in "${NODES[@]}"; do
     pids=()
     replicas="$(shuf -n${client}-$((node + client)) -n$((node / client)))"
     it=$(((node - 1) % 6))
+    echo "$replicas"
     for replica in "${replicas[@]}"; do
         export IPFS_PATH="$HOME/testbed/$replica"
         files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * it)))
