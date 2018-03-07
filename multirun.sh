@@ -51,9 +51,7 @@ for node in "${NODES[@]}"; do
         sleep 1
     done
     echo "Done starting daemons"
-    export IPFS_PATH="$HOME/testbed/0"
-    NODE_0_ADDR="$(ipfs id -f \"\<addrs\>\" | head -n 1 | cut -c 2-)"
-    unset IPFS_PATH
+    NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
     echo "${NODE_0_ADDR}"
 
     for (( i = 1; i < node + client; i++ )); do
@@ -65,32 +63,29 @@ for node in "${NODES[@]}"; do
     pids=()
     replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / (client + 1))))"
     it=$(((node - 1) % 6))
-    echo "$replicas"
     for replica in "${replicas[@]}"; do
-        export IPFS_PATH="$HOME/testbed/$replica"
         files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * it)))
+        API="http://localhost:$((APIPORT + replica))/api/v0"
         for file in "${files[@]}"; do
+            curl -F file="$file" "$API/add?recursive=true"
             ipfs add -r "$file" &> /dev/null &
             pids+=($!)
         done
         ((it++))
-        echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
-        unset IPFS_PATH
+        echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     done
-    export IPFS_PATH="$HOME/testbed/$((node -1))"
-    ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null &
+    API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
+    curl -F file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true"
     pids+=($!)
-    echo "Node: $(ipfs id -f \"\<id\>\") is adding files"
-    unset IPFS_PATH
+    echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     wait "${pids[@]}"
 
     echo "Done adding files"
 
     tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 
-    export IPFS_PATH="$HOME/testbed/0"
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
-    IPFS_FILE_SIZE="$(ipfs files stat "/ipfs/$IPFS_HASH" | awk 'FNR == 2 { print $2 }')"
+    IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
     ITERATIONS=50
     pids=()
     WEBPORT=8080
@@ -104,7 +99,6 @@ for node in "${NODES[@]}"; do
         done
     } >> "$DIR/stats.csv"
     wait "${pids[@]}"
-    unset IPFS_PATH
     pkill ipfs
     pkill trickle
     pkill trickled
