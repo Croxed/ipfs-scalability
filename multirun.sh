@@ -60,25 +60,20 @@ for node in "${NODES[@]}"; do
         curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}"
     done
 
-    pids=()
     replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / (client + 1))))"
     it=$(((node - 1) % 6))
     for replica in "${replicas[@]}"; do
         files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * it)))
         API="http://localhost:$((APIPORT + replica))/api/v0"
         for file in "${files[@]}"; do
-            curl -F file="$file" "$API/add?recursive=true"
-            ipfs add -r "$file" &> /dev/null &
-            pids+=($!)
+            curl -F file="@$file" "$API/add?recursive=true"
         done
         ((it++))
         echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     done
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
-    curl -F file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true"
-    pids+=($!)
+    curl -F file="@$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true"
     echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
-    wait "${pids[@]}"
 
     echo "Done adding files"
 
