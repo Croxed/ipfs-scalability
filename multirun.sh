@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-HOST="http://localhost:8080/ipfs"
-IPFS_HASH="QmUtyrtpwXy7fq6pu6rFQijNcmZaY6XeR2n3oThu2XjBEQ"
+# HOST="http://localhost:8080/ipfs"
+# IPFS_HASH="QmUtyrtpwXy7fq6pu6rFQijNcmZaY6XeR2n3oThu2XjBEQ"
 STATS_FILE="stats.csv"
 head -n 1 "$DIR/template" > "$DIR/$STATS_FILE"
 touch $STATS_FILE
@@ -10,7 +10,7 @@ sed -i "1s/.*/time,size,file,nodes,clients/" "$STATS_FILE"
 
 DEV=lo
 DELAY=50ms
-SPEED="125M"    # Limit network speed for cURL
+SPEED="12M"    # Limit network speed for cURL
 KBITSPEED=10240 # 1Gbit in Kbit
 NODES=(50 60 70)
 client=10
@@ -42,9 +42,9 @@ for node in "${NODES[@]}"; do
     done
     STARTED=0
     while((STARTED > (node + client))); do
-        STARTED="$(find $HOME/testbed/ -maxdepth 2 -type f -name "daemon.stdout" -print0 | xargs -0 awk '/Daemon is ready/{print $5}' | wc -l)"
+        STARTED=0
         for requsts in "${APILIST[@]}"; do
-            if ! curl -s "http://localhost:$request"; then
+            if curl -s "http://localhost:$requsts"; then
                 ((started++))
             fi
         done
