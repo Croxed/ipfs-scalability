@@ -63,6 +63,8 @@ for node in "${NODES[@]}"; do
     replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))"
     for replica in "${replicas[@]}"; do
         files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((replica % 6)))
+        PORT=$((APIPORT + replica))
+        echo "$PORT"
         API="http://localhost:$((APIPORT + replica))/api/v0"
         echo "$API"
         for file in "${files[@]}"; do
@@ -72,7 +74,6 @@ for node in "${NODES[@]}"; do
     done
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
     IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
-    echo "$IPFS_HASH"
     echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 
     echo "Done adding files"
