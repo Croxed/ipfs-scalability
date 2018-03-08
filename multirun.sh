@@ -60,13 +60,11 @@ for node in "${NODES[@]}"; do
         curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}"
     done
 
-    replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))"
+    replicas=( $(shuf -i${client}-$((node + client - 1)) -n$((node / 8))) )
     for replica in "${replicas[@]}"; do
         files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((replica % 6)))
         PORT=$((APIPORT + replica))
-        echo "$PORT"
         API="http://localhost:$((APIPORT + replica))/api/v0"
-        echo "$API"
         for file in "${files[@]}"; do
             curl -s -F file="$file" "$API/add?recursive=true"
         done
