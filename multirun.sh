@@ -61,14 +61,13 @@ for node in "${NODES[@]}"; do
     done
 
     replicas="$(shuf -i${client}-$((node + client - 1)) -n$((node / (client + 1))))"
-    it=$(((node - 1) % 6))
     for replica in "${replicas[@]}"; do
-        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((8 * it)))
+        files=$(find $DIR/files/go-ipfs-0.4.13/* -maxdepth 0 | head -n $((replica % 6)))
         API="http://localhost:$((APIPORT + replica))/api/v0"
+        echo "$API"
         for file in "${files[@]}"; do
             curl -F file="@$file" "$API/add?recursive=true"
         done
-        ((it++))
         echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     done
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
