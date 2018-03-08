@@ -12,8 +12,8 @@ DEV=lo
 DELAY=50ms
 SPEED="12M"    # Limit network speed for cURL
 KBITSPEED=10240 # 1Gbit in Kbit
-NODES=(10 20 30)
-client=2
+NODES=(64 128 256)
+client=10
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
     iptb init -n "$((node + client))" --bootstrap none -f
