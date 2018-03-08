@@ -56,9 +56,10 @@ for node in "${NODES[@]}"; do
 
     for (( i = 1; i < node + client; i++ )); do
         API="http://localhost:$((APIPORT + i))/api/v0"
-        curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}"
-        curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}"
+        curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
+        curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
     done
+    echo "Done bootstrapping $((node + client)) nodes.."
 
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
     IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
@@ -67,7 +68,7 @@ for node in "${NODES[@]}"; do
     replicas=( $(shuf -i${client}-$((node + client - 1)) -n8) )
     for replica in "${replicas[@]}"; do
         API="http://localhost:$((APIPORT + replica))/api/v0"
-        curl -s "$API/pin/add?arg=/ipfs/$IPFS_HASH&recursive=true" &> /dev/null
+        curl --connect-timeout 20 --mat-time 10 -s "$API/pin/add?arg=/ipfs/$IPFS_HASH&recursive=true" &> /dev/null
         echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     done
 
