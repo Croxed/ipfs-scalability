@@ -72,6 +72,7 @@ for node in "${NODES[@]}"; do
     done
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
     IPFS_HASH="$(curl -s -F file="@$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
+    echo "$IPFS_HASH"
     echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 
     echo "Done adding files"
