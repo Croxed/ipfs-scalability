@@ -66,12 +66,12 @@ for node in "${NODES[@]}"; do
         API="http://localhost:$((APIPORT + replica))/api/v0"
         echo "$API"
         for file in "${files[@]}"; do
-            curl -F file="@$file" "$API/add?recursive=true"
+            curl -s -F file="@$file" "$API/add?recursive=true"
         done
         echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
     done
     API="http://localhost:$((APIPORT + (client + node - 1)))/api/v0"
-    curl -F file="@$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true"
+    IPFS_HASH="$(curl -s -F file="@$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
     echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 
     echo "Done adding files"
