@@ -8,9 +8,10 @@ ITERATIONS=$6
 API=$7
 CLIENTS=$8
 SPEED="12M"
+TIME=10
 
 for (( i = 0; i < "$ITERATIONS"; i++ )); do
-    curl_data="$(curl --limit-rate $SPEED -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total}")"
+    curl_data="$(curl --max-time $TIME --limit-rate $SPEED -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total}")"
     echo "$curl_data,$IPFS_FILE_SIZE,$IPFS_FILE,$node,$CLIENTS"
     curl -sSn "$API/repo/gc" &> /dev/null
 done
