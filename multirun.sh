@@ -1,8 +1,6 @@
 #! /usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# HOST="http://localhost:8080/ipfs"
-# IPFS_HASH="QmUtyrtpwXy7fq6pu6rFQijNcmZaY6XeR2n3oThu2XjBEQ"
 STATS_FILE="stats.csv"
 head -n 1 "$DIR/template" > "$DIR/$STATS_FILE"
 touch $STATS_FILE
@@ -13,7 +11,7 @@ DELAY=50ms
 SPEED="12M"    # Limit network speed for cURL
 KBITSPEED=10240 # 1Gbit in Kbit
 NODES=(64 128 256)
-client=10
+client=1
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
     iptb init -n "$((node + client))" --bootstrap none -f
@@ -78,7 +76,7 @@ for node in "${NODES[@]}"; do
 
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
-    ITERATIONS=50
+    ITERATIONS=100
     pids=()
     WEBPORT=8080
     APIPORT=5001
