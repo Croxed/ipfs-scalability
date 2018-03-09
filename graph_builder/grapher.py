@@ -17,13 +17,14 @@ def set_xaxis_title(bp):
 
 with PdfPages('plot.pdf') as pdf:
     df = pd.read_csv(sys.argv[1], sep=',', na_values=".")
-    plt.figure()
-    bp = df.boxplot(column='time', by='nodes', patch_artist=True, showfliers=False)
+    fig, ax = plt.subplots(facecolor='#F7DFBF')
+    bp = df.boxplot(column='time', by='nodes', ax=ax, patch_artist=True, showfliers=False)
+    bp.set_facecolor('#F4D9B1')
     plt.title(df.iloc[0]['file'])
     plt.xlabel("Nodes")
     plt.ylabel("Time (s)")
     plt.suptitle("")
-    pdf.savefig()
+    pdf.savefig(figure=fig, facecolor=fig.get_facecolor(), transparent=True)
     plt.close()
 
     # uniqueData = np.unique(df['nodes'])

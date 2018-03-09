@@ -29,14 +29,24 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     APILIST=()
-    for (( i = 0; i < node + client; i++ )); do
-        export IPFS_PATH="$HOME/testbed/$i"
-        ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-        APILIST+=$((APIPORT + i))
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
-        echo $! > "$IPFS_PATH/daemon.pid"
-        echo "Starting node $i"
-        unset IPFS_PATH
+    for (( i = client; i < client; i++ )); do
+        export ipfs_path="$home/testbed/$i"
+        ipfs config addresses.api /ip4/0.0.0.0/tcp/"$((apiport + i))"
+        apilist+=$((apiport + i))
+        trickle -s -u "$kbitspeed" -d "$kbitspeed" ipfs daemon --enable-gc=true > "$ipfs_path/daemon.stdout" 2> "$ipfs_path/daemon.stderr" &
+        echo $! > "$ipfs_path/daemon.pid"
+        echo "starting node $i"
+        unset ipfs_path
+    done
+
+    for (( i = client; i < node + client; i++ )); do
+        export ipfs_path="$home/testbed/$i"
+        ipfs config addresses.api /ip4/0.0.0.0/tcp/"$((apiport + i))"
+        apilist+=$((apiport + i))
+        trickle -s -u "$kbitspeed" -d "$kbitspeed" ipfs daemon > "$ipfs_path/daemon.stdout" 2> "$ipfs_path/daemon.stderr" &
+        echo $! > "$ipfs_path/daemon.pid"
+        echo "starting node $i"
+        unset ipfs_path
     done
     STARTED=0
     while((STARTED > (node + client))); do
