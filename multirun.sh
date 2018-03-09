@@ -25,7 +25,7 @@ for node in "${NODES[@]}"; do
         export IPFS_PATH="$HOME/testbed/$i"
         ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$((WEBPORT + i))"
         ipfs config Datastore.StorageMax 0GB
-        ipfs config Datastore.StorageGCWatermark 1
+        ipfs config --json Datastore.StorageGCWatermark 0
         ipfs config Datastore.GCPeriod 0h
         unset IPFS_PATH
     done
