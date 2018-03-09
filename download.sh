@@ -10,6 +10,8 @@ CLIENTS=$7
 SPEED="12M"
 TIME=10
 
+echo "$@"
+
 for (( i = 0; i < "$ITERATIONS"; i++ )); do
     curl_data="$(curl --connect-timeout $TIME --max-time $TIME --limit-rate $SPEED -sSn "$HOST/$IPFS_HASH" -o /dev/null -w "%{time_total}")"
     echo "$curl_data,$IPFS_FILE_SIZE,$IPFS_FILE,$node,$CLIENTS"
