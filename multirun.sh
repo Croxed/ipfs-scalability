@@ -30,7 +30,7 @@ for node in "${NODES[@]}"; do
     done
     APILIST=()
     for (( i = client; i < client; i++ )); do
-        export ipfs_path="$home/testbed/$i"
+        export ipfs_path="$HOME/testbed/$i"
         ipfs config addresses.api /ip4/0.0.0.0/tcp/"$((apiport + i))"
         apilist+=$((apiport + i))
         trickle -s -u "$kbitspeed" -d "$kbitspeed" ipfs daemon --enable-gc=true > "$ipfs_path/daemon.stdout" 2> "$ipfs_path/daemon.stderr" &
@@ -40,7 +40,7 @@ for node in "${NODES[@]}"; do
     done
 
     for (( i = client; i < node + client; i++ )); do
-        export ipfs_path="$home/testbed/$i"
+        export ipfs_path="$HOME/testbed/$i"
         ipfs config addresses.api /ip4/0.0.0.0/tcp/"$((apiport + i))"
         apilist+=$((apiport + i))
         trickle -s -u "$kbitspeed" -d "$kbitspeed" ipfs daemon > "$ipfs_path/daemon.stdout" 2> "$ipfs_path/daemon.stderr" &
@@ -93,8 +93,8 @@ for node in "${NODES[@]}"; do
     {
         for (( i = 0; i < "$client"; i++ )); do
             HOST="http://localhost:$((WEBPORT + i))/ipfs"
-            API="http://localhost:$((APIPORT + i))/api/v0"
-            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $API $client &
+            # API="http://localhost:$((APIPORT + i))/api/v0"
+            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $client &
             pids+=($!)
         done
     } >> "$DIR/stats.csv"
