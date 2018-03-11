@@ -14,6 +14,7 @@ NODES=(16 32 64 128)
 client=1
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
+    rm -rf "$DIR/ipfs_*"
     WEBPORT=8080
     APIPORT=5001
     APILIST=()
