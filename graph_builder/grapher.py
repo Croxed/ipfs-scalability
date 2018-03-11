@@ -7,7 +7,6 @@ import matplotlib.cbook as cbook
 import sys
 from matplotlib.backends.backend_pdf import PdfPages
 from hurry.filesize import size
-from scipy import stats
 
 def set_xaxis_title(bp):
     labels = [item.get_text() for item in bp.get_xticklabels()]

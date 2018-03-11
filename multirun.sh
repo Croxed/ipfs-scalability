@@ -9,29 +9,39 @@ sed -i "1s/.*/time,size,file,nodes,clients/" "$STATS_FILE"
 DEV=lo
 DELAY=50ms
 SPEED="12M"    # Limit network speed for cURL
-KBITSPEED=10240 # 1Gbit in Kbit
-NODES=(64 128 256)
+KBITSPEED=10240 # 100Mbit in Kbit
+NODES=(16 32 64 128)
 client=1
 tc qdisc del dev "$DEV" root netem
 for node in "${NODES[@]}"; do
-    iptb init -n "$((node + client))" --bootstrap none -f
-    trickled 
     WEBPORT=8080
     APIPORT=5001
-    export IPFS_PATH="$HOME/testbed/0"
+    APILIST=()
+    pids=()
+    for (( i = 0; i < client + node; i++ )); do
+        rm -rf "$DIR/ipfs_$i"
+        mkdir -p "$DIR/ipfs_$i"
+        export IPFS_PATH="$DIR/ipfs_$i"
+        ipfs init -e --profile test &> /dev/null &
+        pids+=($!)
+        ipfs bootstrap rm all &> /dev/null &
+        APILIST+=$((APIPORT + i))
+        unset IPFS_PATH
+    done
+    wait "${pids[@]}"
+    export IPFS_PATH="$DIR/ipfs_0"
     IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
     unset IPFS_PATH
     for (( i = 0; i < client; i++ )); do
-        export IPFS_PATH="$HOME/testbed/$i"
+        export IPFS_PATH="$DIR/ipfs_$i"
         ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/"$((WEBPORT + i))"
         ipfs config Datastore.StorageMax 0GB
         ipfs config --json Datastore.StorageGCWatermark 0
         ipfs config Datastore.GCPeriod 0h
         unset IPFS_PATH
     done
-    APILIST=()
     for (( i = 0; i < client; i++ )); do
-        export IPFS_PATH="$HOME/testbed/$i"
+        export IPFS_PATH="$DIR/ipfs_$i"
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
         APILIST+=$((APIPORT + i))
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
@@ -40,7 +50,7 @@ for node in "${NODES[@]}"; do
         unset IPFS_PATH
     done
     for (( i = client; i < node + client; i++ )); do
-        export IPFS_PATH="$HOME/testbed/$i"
+        export IPFS_PATH="$DIR/ipfs_$i"
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
         APILIST+=$((APIPORT + i))
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
@@ -86,21 +96,21 @@ for node in "${NODES[@]}"; do
 
     IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
     IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
-    ITERATIONS=100
+    ITERATIONS=500
     pids=()
     WEBPORT=8080
     APIPORT=5001
     {
         for (( i = 0; i < "$client"; i++ )); do
             HOST="http://localhost:$((WEBPORT + i))/ipfs"
-            # API="http://localhost:$((APIPORT + i))/api/v0"
-            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $client &
+            API="http://localhost:$((APIPORT + i))/api/v0"
+            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $ITERATIONS $API $client &
             pids+=($!)
         done
     } >> "$DIR/stats.csv"
     wait "${pids[@]}"
     pkill ipfs
+    pkill ipfs # 2 times since IPFS wont forcefully quit otherwise
     pkill trickle
-    pkill trickled
-    tc qdisc del dev "$DEV" root netem # iptb stop
+    tc qdisc del dev "$DEV" root netem 
 done
