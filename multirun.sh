@@ -116,3 +116,4 @@ for node in "${NODES[@]}"; do
     pkill trickle
     tc qdisc del dev "$DEV" root netem 
 done
+echo "Done running simulation of $NODES"
