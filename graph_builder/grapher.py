@@ -16,9 +16,9 @@ def set_xaxis_title(bp):
 
 with PdfPages('plot.pdf') as pdf:
     df = pd.read_csv(sys.argv[1], sep=',', na_values=".")
-    fig, ax = plt.subplots(facecolor='#F7DFBF')
+    fig, ax = plt.subplots(facecolor='#FFFFFF')
     bp = df.boxplot(column='time', by='nodes', ax=ax, patch_artist=True, showfliers=False)
-    bp.set_facecolor('#F4D9B1')
+    bp.set_facecolor('#FFFFFF')
     plt.title(df.iloc[0]['file'])
     plt.xlabel("Nodes")
     plt.ylabel("Time (s)")
