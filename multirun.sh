@@ -101,12 +101,12 @@ for node in "${NODES[@]}"; do
     pids=()
     WEBPORT=8080
     APIPORT=5001
-    client=10
+    clients=10
     {
-        for (( i = 0; i < "$client"; i++ )); do
+        for (( i = 0; i < "$clients"; i++ )); do
             HOST="http://localhost:$((WEBPORT))/ipfs"
             API="http://localhost:$((APIPORT))/api/v0"
-            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $((ITERATIONS / client)) $API $client &
+            bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $node $((ITERATIONS / clients)) $API $client &
             pids+=($!)
         done
     } >> "$DIR/stats.csv"
