@@ -84,7 +84,9 @@ for node in "${NODES[@]}"; do
     IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
     echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 
-    replicas=( "$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))" )
+    declare -a replicas
+    readarray -t replicas < <(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))
+    # replicas=( "$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))" )
     for replica in "${replicas[@]}"; do
         API="http://localhost:$((APIPORT + replica))/api/v0"
         curl --connect-timeout 20 --mat-time 10 -s "$API/pin/add?arg=/ipfs/$IPFS_HASH&recursive=true" &> /dev/null
