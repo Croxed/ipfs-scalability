@@ -26,7 +26,7 @@ for node in "${NODES[@]}"; do
         ipfs init -e --profile test &> /dev/null &
         pids+=($!)
         ipfs bootstrap rm all &> /dev/null &
-        APILIST+=$((APIPORT + i))
+        APILIST+=( $((APIPORT + i)) )
         unset IPFS_PATH
     done
     wait "${pids[@]}"
@@ -44,7 +44,7 @@ for node in "${NODES[@]}"; do
     for (( i = 0; i < client; i++ )); do
         export IPFS_PATH="$DIR/ipfs_$i"
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-        APILIST+=$((APIPORT + i))
+        APILIST+=( $((APIPORT + i)) )
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
         echo "Starting node $i"
@@ -53,7 +53,7 @@ for node in "${NODES[@]}"; do
     for (( i = client; i < node + client; i++ )); do
         export IPFS_PATH="$DIR/ipfs_$i"
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-        APILIST+=$((APIPORT + i))
+        APILIST+=( $((APIPORT + i)) )
         trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
         echo "Starting node $i"
@@ -118,4 +118,4 @@ for node in "${NODES[@]}"; do
     pkill trickle
     tc qdisc del dev "$DEV" root netem 
 done
-echo "Done running simulation of $NODES"
+echo "Done running simulation of ${#NODES[@]}"
