@@ -60,3 +60,4 @@ echo "Done bootstrapping $((NODE)) nodes.."
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 
 watch -n1 ps -C ipfs -o cmd,%cpu,%mem
+cat
