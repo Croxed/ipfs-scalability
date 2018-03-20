@@ -34,7 +34,7 @@ for (( i = 0; i < NODE; i++ )); do
     unset IPFS_PATH
 done
 STARTED=0
-while(STARTED > NODE); do
+while((STARTED > NODE)); do
     STARTED=0
     for requsts in "${APILIST[@]}"; do
         if curl -s "http://localhost:$requsts"; then
@@ -59,8 +59,5 @@ echo "Done bootstrapping $((NODE)) nodes.."
 
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 
-array=()
-while IFS=  read -r -d $'\0'; do
-    array+=("$REPLY")
-done < <(find . -name "*.pid" -exec cat {} \;)
-watch -n1 -p "${array[*]// /,}" -o comm,%cpu,%mem
+array="$(find $DIR -name "*.pid" -exec cat {} \;)"
+watch -n1 ps -p "$(echo $array | tr ' ' ,)" -o comm,%cpu,%mem
