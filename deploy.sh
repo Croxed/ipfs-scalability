@@ -59,5 +59,4 @@ echo "Done bootstrapping $((NODE)) nodes.."
 
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 
-array="$(find $DIR -name "*.pid" -exec cat {} \;)"
-watch -n1 ps -p "$(echo $array | tr ' ' ,)" -o comm,%cpu,%mem
+watch -n1 ps -C ipfs -o cmd,%cpu,%mem
