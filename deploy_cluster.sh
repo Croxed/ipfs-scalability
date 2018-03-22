@@ -37,7 +37,7 @@ STARTED=0
 while((STARTED < NODE)); do
     STARTED=0
     for requsts in "${APILIST[@]}"; do
-        if curl -s "http://localhost:$requsts"; then
+        if ! curl -fs "http://localhost:$requsts"; then
             ((STARTED++))
         fi
     done
