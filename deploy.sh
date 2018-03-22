@@ -64,7 +64,7 @@ for (( i = 0; i < NODE + 1; i++ )); do
     curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
     curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
     ADDR="$(curl -s $API/id?format=\<id\> | jq '.Addresses[1]' | cut -d "\"" -f 2)"
-    echo "$ADDR" >> "$DIR/clients.txt"
+    echo "$API" >> "$DIR/clients.txt"
 
 done
 echo "Done bootstrapping $((NODE)) nodes.."
