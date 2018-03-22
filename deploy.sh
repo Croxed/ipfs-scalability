@@ -13,7 +13,7 @@ rm -rf "$DIR/ipfs_*"
 APIPORT=5001
 APILIST=()
 pids=()
-for (( i = 0; i < NODE; i++ )); do
+for (( i = 0; i < NODE + 1; i++ )); do
     rm -rf "$DIR/ipfs_$i"
     mkdir -p "$DIR/ipfs_$i"
     export IPFS_PATH="$DIR/ipfs_$i"
