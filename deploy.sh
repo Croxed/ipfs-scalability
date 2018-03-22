@@ -33,7 +33,7 @@ for (( i = 0; i < NODE + 1; i++ )); do
         ipfs config Datastore.GCPeriod 0h
         ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
         APILIST+=( $((APIPORT + i)) )
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
+        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
         echo $! > "$IPFS_PATH/daemon.pid"
         echo "Starting node $i"
     else
