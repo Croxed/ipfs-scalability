@@ -24,29 +24,17 @@ for (( i = 0; i < NODE; i++ )); do
     unset IPFS_PATH
 done
 wait "${pids[@]}"
-for (( i = 0; i < NODE + 1; i++ )); do
+for (( i = 0; i < NODE; i++ )); do
     export IPFS_PATH="$DIR/ipfs_$i"
-    if [[ "$i" -eq 0 ]]; then
-        ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
-        ipfs config Datastore.StorageMax 0GB
-        ipfs config --json Datastore.StorageGCWatermark 0
-        ipfs config Datastore.GCPeriod 0h
-        ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-        APILIST+=( $((APIPORT + i)) )
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
-        echo $! > "$IPFS_PATH/daemon.pid"
-        echo "Starting node $i"
-    else
-        ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-        APILIST+=( $((APIPORT + i)) )
-        trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
-        echo $! > "$IPFS_PATH/daemon.pid"
-        echo "Starting node $i"
-    fi
+    ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
+    APILIST+=( $((APIPORT + i)) )
+    trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
+    echo $! > "$IPFS_PATH/daemon.pid"
+    echo "Starting node $i"
     unset IPFS_PATH
 done
 STARTED=0
-while((STARTED < NODE + 1)); do
+while((STARTED < NODE)); do
     STARTED=0
     for requsts in "${APILIST[@]}"; do
         if curl -s "http://localhost:$requsts"; then
@@ -56,10 +44,11 @@ while((STARTED < NODE + 1)); do
     sleep 1
 done
 echo "Done starting daemons"
-NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
+NODE_0_ADDR=$1
+# NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 echo "${NODE_0_ADDR}"
 
-for (( i = 0; i < NODE + 1; i++ )); do
+for (( i = 0; i < NODE; i++ )); do
     API="http://localhost:$((APIPORT + i))/api/v0"
     curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
     curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
