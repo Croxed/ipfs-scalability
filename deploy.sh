@@ -57,7 +57,7 @@ while((STARTED < NODE + 1)); do
 done
 echo "Done starting daemons"
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
-echo "${NODE_0_ADDR}"
+echo "${NODE_0_ADDR}" > node0.txt
 
 for (( i = 0; i < NODE + 1; i++ )); do
     API="http://localhost:$((APIPORT + i))/api/v0"
