@@ -63,12 +63,19 @@ for (( i = 0; i < NODE + 1; i++ )); do
     API="http://localhost:$((APIPORT + i))/api/v0"
     curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
     curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
-    ADDR="$(curl -s $API/id?format=\<id\> | jq '.Addresses[1]' | cut -d "\"" -f 2)"
+    # ADDR="$(curl -s $API/id?format=\<id\> | jq '.Addresses[1]' | cut -d "\"" -f 2)"
     echo "$API" >> "$DIR/clients.txt"
 
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
+MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
+IFS=' ' read -r -a array <<< "$@"
+ADDRESS="${$NODE_0_ADDR//127.0.0.1/$MYIP}"
+for cluster in "${array[@]}" ; do
+    printf -v __ %q "$ADDRESS"
+    ssh root@"$cluster" "bash /root/ipfs-scalability/deploy_cluster.sh $__"
+done
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 
 watch -n1 ps -C ipfs -o cmd,%cpu,%mem
