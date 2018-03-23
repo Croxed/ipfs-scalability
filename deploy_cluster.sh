@@ -6,7 +6,7 @@ DELAY=50ms
 KBITSPEED=10240 # 100Mbit in Kbit
 NODE=64
 
-echo "" > "$DIR/clients.txt"
+printf "" > "$DIR/clients.txt"
 
 tc qdisc del dev "$DEV" root netem
 rm -rf "$DIR/ipfs_*"
