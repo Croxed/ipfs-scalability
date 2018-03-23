@@ -2,13 +2,17 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 DEV=lo
+DEV1=enp1s0
 DELAY=50ms
 KBITSPEED=10240 # 100Mbit in Kbit
 NODE=64
 
+printf "Running... $(date) \n" > "$DIR/running.txt"
+
 printf "" > "$DIR/clients.txt"
 
 tc qdisc del dev "$DEV" root netem
+tc qdisc del dev "$DEV1" root netem
 rm -rf "$DIR/ipfs_*"
 APIPORT=5001
 APILIST=()
@@ -59,6 +63,6 @@ done
 echo "Done bootstrapping $((NODE)) nodes.."
 
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
+tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
 
-watch -n1 ps -C ipfs -o cmd,%cpu,%mem
 cat
