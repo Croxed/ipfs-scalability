@@ -44,7 +44,7 @@ def scalability_test(IPFS_PATH, HASH, iterations):
     data = []
     for file_path in file_list:
         data.append(np.genfromtxt(file_path))
-    distribution = random.sample(data, (len(data) / 8))
+    distribution = np.random.choice(data, (len(data) / 8))
     for data in distribution:
         pattern = '(?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
         match = re.search(pattern, data)
