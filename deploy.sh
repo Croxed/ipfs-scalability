@@ -38,7 +38,6 @@ nvim "$IPFS_PATH/config"
 trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
 echo $! > "$IPFS_PATH/daemon.pid"
 echo "Starting node $i"
-echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/clients.txt"
 unset IPFS_PATH
 
 STARTED=0
