@@ -10,7 +10,7 @@ MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 
 printf "Running... $(date) \n" > "$DIR/running.txt"
 
-printf "" > "$DIR/clients.txt"
+printf "" > "$DIR/client.txt"
 
 tc qdisc del dev "$DEV" root netem
 tc qdisc del dev "$DEV1" root netem
@@ -35,10 +35,12 @@ for (( i = 0; i < NODE; i++ )); do
     APILIST+=( $((APIPORT + i)) )
     trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
     echo $! > "$IPFS_PATH/daemon.pid"
-    echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/clients.txt"
+    echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/client.txt"
     echo "Starting node $i"
     unset IPFS_PATH
 done
+rm -rf "$DIR/clients.txt"
+mv "$DIR/client.txt" "$DIR/clients.txt"
 STARTED=0
 while((STARTED < NODE)); do
     STARTED=0
