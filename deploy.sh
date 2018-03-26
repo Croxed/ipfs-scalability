@@ -69,8 +69,13 @@ tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
 sleep 2
 for cluster in "${array[@]}" ; do
-    rm -rf "$DIR/clients_$cluster.txt"
-    scp root@"$cluster" "/root/ipfs-scalability/clients.txt" "$DIR/clients_$cluster.txt"
+    while true; do
+        rm -rf "$DIR/clients_$cluster.txt"
+        if scp root@"$cluster:/root/ipfs-scalability/clients.txt" "$DIR/clients_$cluster.txt" &> /dev/null; then
+            break;
+        fi
+        sleep 3
+    done
 done
 
 for (( i = 0; i < CLIENTS; i++)); do
