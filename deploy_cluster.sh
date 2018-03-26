@@ -5,7 +5,8 @@ DEV=lo
 DEV1=enp1s0
 DELAY=50ms
 KBITSPEED=10240 # 100Mbit in Kbit
-NODE=64
+NODE=$2
+MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
 
 printf "Running... $(date) \n" > "$DIR/running.txt"
 
@@ -34,6 +35,7 @@ for (( i = 0; i < NODE; i++ )); do
     APILIST+=( $((APIPORT + i)) )
     trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
     echo $! > "$IPFS_PATH/daemon.pid"
+    echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/clients.txt"
     echo "Starting node $i"
     unset IPFS_PATH
 done
@@ -56,9 +58,6 @@ for (( i = 0; i < NODE; i++ )); do
     API="http://localhost:$((APIPORT + i))/api/v0"
     curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
     curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
-    ADDR="$(curl -s $API/id?format=\<id\> | jq '.Addresses[1]' | cut -d "\"" -f 2)"
-    echo "$ADDR" >> "$DIR/clients.txt"
-
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 

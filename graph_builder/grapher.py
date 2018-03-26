@@ -1,12 +1,14 @@
 import datetime
+import sys
+
 import matplotlib as mpl
+import matplotlib.cbook as cbook
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.cbook as cbook
-import sys
-from matplotlib.backends.backend_pdf import PdfPages
 from hurry.filesize import size
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 def set_xaxis_title(bp):
     labels = [item.get_text() for item in bp.get_xticklabels()]
@@ -14,10 +16,12 @@ def set_xaxis_title(bp):
         labels[i] = size(int(labels[i]))
     bp.set_xticklabels(labels)
 
+
 with PdfPages('plot.pdf') as pdf:
     df = pd.read_csv(sys.argv[1], sep=',', na_values=".")
     fig, ax = plt.subplots(facecolor='#FFFFFF')
-    bp = df.boxplot(column='time', by='nodes', ax=ax, patch_artist=True, showfliers=False)
+    bp = df.boxplot(
+        column='time', by='nodes', ax=ax, patch_artist=True, showfliers=False)
     bp.set_facecolor('#FFFFFF')
     plt.title(df.iloc[0]['file'])
     plt.xlabel("Nodes")
