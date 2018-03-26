@@ -78,8 +78,8 @@ for cluster in "${array[@]}" ; do
     done
 done
 
-echo "python3 $DIR/node_download.py $IPFS_PATH IPFS_HASH 1000 $((NODES * 3))"
 for (( i = 0; i < CLIENTS; i++)); do
     IPFS_PATH="$DIR/ipfs_$i"
+    echo "python3 $DIR/node_download.py $IPFS_PATH $IPFS_HASH 1000 $((NODES * 3))"
     python3 "$DIR/node_download.py" "$IPFS_PATH" "$IPFS_HASH" 1000 $((NODES * 3)) 
 done
