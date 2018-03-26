@@ -52,7 +52,9 @@ while((STARTED < CLIENTS)); do
 done
 echo "Done starting daemons"
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
+export IPFS_PATH="$DIR/ipfs_0"
 IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
+unset IPFS_PATH
 
 for (( i = 0; i < CLIENTS; i++ )); do
     API="http://localhost:$((APIPORT + i))/api/v0"
