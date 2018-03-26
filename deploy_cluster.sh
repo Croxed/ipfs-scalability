@@ -35,7 +35,7 @@ for (( i = 0; i < NODE; i++ )); do
     APILIST+=( $((APIPORT + i)) )
     trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
     echo $! > "$IPFS_PATH/daemon.pid"
-    echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/client.txt"
+    printf "http://%s:%si," "$MYIP" $((APIPORT + i)) >> "$DIR/client.txt"
     echo "Starting node $i"
     unset IPFS_PATH
 done
