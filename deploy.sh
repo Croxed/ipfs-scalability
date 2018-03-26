@@ -17,31 +17,30 @@ rm -rf "$DIR/ipfs_*"
 APIPORT=5001
 APILIST=()
 pids=()
-for (( i = 0; i < CLIENTS; i++ )); do
-    rm -rf "$DIR/ipfs_$i"
-    mkdir -p "$DIR/ipfs_$i"
-    export IPFS_PATH="$DIR/ipfs_$i"
-    ipfs init -e --profile test &> /dev/null &
-    pids+=($!)
-    ipfs bootstrap rm all &> /dev/null &
-    APILIST+=( $((APIPORT + i)) )
-    unset IPFS_PATH
-done
+rm -rf "$DIR/ipfs_0"
+mkdir -p "$DIR/ipfs_0"
+export IPFS_PATH="$DIR/ipfs_0"
+ipfs init -e --profile test &> /dev/null &
+pids+=($!)
+ipfs bootstrap rm all &> /dev/null &
+APILIST+=( $((APIPORT + i)) )
+unset IPFS_PATH
 wait "${pids[@]}"
-for (( i = 0; i < CLIENTS; i++ )); do
-    export IPFS_PATH="$DIR/ipfs_$i"
-    ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
-    ipfs config Datastore.StorageMax 0GB
-    ipfs config --json Datastore.StorageGCWatermark 0
-    ipfs config Datastore.GCPeriod 0h
-    ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-    APILIST+=( $((APIPORT + i)) )
-    trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
-    echo $! > "$IPFS_PATH/daemon.pid"
-    echo "Starting node $i"
-    echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/clients.txt"
-    unset IPFS_PATH
-done
+
+export IPFS_PATH="$DIR/ipfs_0"
+ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
+ipfs config Datastore.StorageMax 0GB
+ipfs config --json Datastore.StorageGCWatermark 0
+ipfs config Datastore.GCPeriod 0h
+ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
+APILIST+=( $((APIPORT + i)) )
+nvim "$IPFS_PATH/config"
+trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
+echo $! > "$IPFS_PATH/daemon.pid"
+echo "Starting node $i"
+echo "http://$MYIP:$((APIPORT + i))" >> "$DIR/clients.txt"
+unset IPFS_PATH
+
 STARTED=0
 while((STARTED < CLIENTS)); do
     STARTED=0
@@ -71,7 +70,8 @@ tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
 sleep 2
 for cluster in "${array[@]}" ; do
-    scp root@"$cluster" "/root/ipfs-scalability/clients.txt" "$DIR/"
+    rm -rf "$DIR/clients_$cluster.txt"
+    scp root@"$cluster" "/root/ipfs-scalability/clients.txt" "$DIR/clients_$cluster.txt"
 done
 
 for (( i = 0; i < CLIENTS; i++)); do
