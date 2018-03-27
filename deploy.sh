@@ -86,7 +86,10 @@ for cluster in "${array[@]}" ; do
     done
 done
 
-readarray -t myarray < <(cat "$DIR/clients_*.txt")
+
+inFiles=(clients_*.txt)
+
+readarray -t myarray < <(cat "${inFiles[@]}")
 
 declare -a replicas
 readarray -t replicas < <(shuf -i0-$((${myarray[@]} - 1)) -n$((${myarray[@]} / 8)))
