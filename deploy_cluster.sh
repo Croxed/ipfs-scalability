@@ -12,6 +12,8 @@ printf "Running... %s \n" "$(date)" > "$DIR/running.txt"
 
 printf "" > "$DIR/client.txt"
 
+kill -9 "$(cat "$DIR/daemon.pid")"
+pgrep -f deploy_cluster.sh > "$DIR/daemon.pid"
 pkill ipfs
 pkill ipfs
 

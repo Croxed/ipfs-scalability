@@ -69,7 +69,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2 | sed "s/127.0.0.1/${MYIP}/")"
 	IFS=' ' read -r -a array <<< "$@"
 	for cluster in "${array[@]}" ; do
-		ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; kill -9 <(/root/ipfs-scalability/daemon.pid); nohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1 & echo $! > /root/ipfs-scalability/daemon.pid) &'"
+		ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; nohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1 & echo $! > /root/ipfs-scalability/daemon.pid) &'"
 	done
 	tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 	tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
