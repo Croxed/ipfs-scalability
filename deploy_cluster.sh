@@ -52,7 +52,7 @@ IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true"
 echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 
 declare -a replicas
-readarray -t replicas < <(shuf -i$((NODE - i)) -n$((NODE / 8)))
+readarray -t replicas < <(shuf -i$((NODE - 1)) -n$((NODE / 8)))
 # replicas=( "$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))" )
 for replica in "${replicas[@]}"; do
     API="http://localhost:$((APIPORT + replica))/api/v0"
