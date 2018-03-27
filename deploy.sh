@@ -67,7 +67,7 @@ for (( i = 0; i < CLIENTS; i++ )); do
     curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &> /dev/null
     curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &> /dev/null
 done
-echo "Done bootstrapping $((NODE)) nodes.."
+echo "Done bootstrapping $((CLIENTS)) clients.."
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2 | sed "s/127.0.0.1/${MYIP}/")"
 IFS=' ' read -r -a array <<< "$@"
 for cluster in "${array[@]}" ; do
