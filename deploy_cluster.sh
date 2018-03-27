@@ -7,7 +7,7 @@ DELAY=50ms
 KBITSPEED=10240 # 100Mbit in Kbit
 eval NODE="$2"
 MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
-
+rm -rf "$DIR/clients.txt"
 printf "Running... %s \n" "$(date)" > "$DIR/running.txt"
 
 printf "" > "$DIR/client.txt"
@@ -35,33 +35,13 @@ for (( i = 0; i < NODE; i++ )); do
     APILIST+=( $((APIPORT + i)) )
     trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
     echo $! > "$IPFS_PATH/daemon.pid"
-    printf "http://%s:%si," "$MYIP" "$((APIPORT + i))" >> "$DIR/client.txt"
+    printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >> "$DIR/client.txt"
     echo "Starting node $i"
     unset IPFS_PATH
 done
 
-if [ ! -f "$DIR/files/v0.4.13.tar.gz" ]; then
-    wget "https://github.com/ipfs/go-ipfs/archive/v0.4.13.tar.gz" -O "$DIR/files/v0.4.13.tar.gz"
-fi
-
-rm -rf "$DIR/files/go-ipfs-0.4.13"
-tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/"
-
-API="http://localhost:$((APIPORT + (NODE - 1)))/api/v0"
-IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
-curl -F file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" 
-echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding hash $IPFS_HASH"
-
-declare -a replicas
-readarray -t replicas < <(shuf -i0-$((NODE - 1)) -n$((NODE / 8)))
-# replicas=( "$(shuf -i${client}-$((node + client - 1)) -n$((node / 8)))" )
-for replica in "${replicas[@]}"; do
-    API="http://localhost:$((APIPORT + replica))/api/v0"
-    curl --connect-timeout 20 --max-time 10 -s "$API/pin/add?arg=/ipfs/$IPFS_HASH&recursive=true" &> /dev/null
-    echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
-done
-rm -rf "$DIR/clients.txt"
 mv "$DIR/client.txt" "$DIR/clients.txt"
+
 STARTED=0
 while((STARTED < NODE)); do
     STARTED=0

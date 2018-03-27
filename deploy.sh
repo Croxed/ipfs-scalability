@@ -86,6 +86,26 @@ for cluster in "${array[@]}" ; do
     done
 done
 
+declare -a myarray
+let i=0
+while IFS=$'\n' read -r line_data; do
+    # Parse “${line_data}” to produce content 
+    # that will be stored in the array.
+    # (Assume content is stored in a variable 
+    # named 'array_element'.)
+    # ...
+    myarray[i]="${array_element}" # Populate array.
+    ((++i))
+done < "$DIR/clients_*"
+
+declare -a replicas
+readarray -t replicas < <(shuf -i0-$((${myarray[@]} - 1)) -n$((${myarray[@]} / 8)))
+for replica in "${replicas[@]}"; do
+	API="http://localhost:$((APIPORT + replica))/api/v0"
+	curl --connect-timeout 20 --mat-time 10 -s -F file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" &> /dev/null
+	echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
+done
+
 for (( i = 0; i < CLIENTS; i++)); do
     IPFS_PATH="$DIR/ipfs_$i"
     echo "python3 $DIR/node_download.py $IPFS_PATH $IPFS_HASH 1000 $((NODES * 3))"
