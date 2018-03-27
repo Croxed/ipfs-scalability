@@ -15,7 +15,7 @@ import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file = open(dir_path + "/stats.csv", "a")
-nodes = 0
+nodes = sys.argv[4]
 
 
 @contextmanager
@@ -47,7 +47,7 @@ def scalability_test(IPFS_PATH, HASH, iterations):
     for file_path in file_list:
         data.append(pd.read_csv(file_path))
     frame = pd.concat(data)
-    distribution = frame.sample((len(data) / 8))
+    distribution = frame.sample(len(frame.index) / 8)
     for data in distribution:
         pattern = '(?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
         match = re.search(pattern, data)
@@ -61,6 +61,4 @@ def scalability_test(IPFS_PATH, HASH, iterations):
 
 if __name__ == '__main__':
     file.write("time,nodes\n")
-    global nodes
-    nodes = sys.argv[4]
     scalability_test(sys.argv[1], sys.argv[2], sys.argv[3])
