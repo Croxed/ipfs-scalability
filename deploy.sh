@@ -57,13 +57,6 @@ echo "Done starting daemons"
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 export IPFS_PATH="$DIR/ipfs_0"
 
-if [ ! -f "$DIR/files/v0.4.13.tar.gz" ]; then
-	wget "https://github.com/ipfs/go-ipfs/archive/v0.4.13.tar.gz" -O "$DIR/files/v0.4.13.tar.gz"
-fi
-
-rm -rf "$DIR/files/go-ipfs-0.4.13"
-tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/"
-
 IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
 unset IPFS_PATH
 
@@ -99,7 +92,7 @@ readarray -t myarray < <(cat "${inFiles[@]}")
 declare -a replicas
 readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
 for replica in "${replicas[@]}"; do
-	curl --connect-timeout 20 --mat-time 10 -s -F file="$DIR/files/go-ipfs-0.4.13" "$replica/api/v0/add?recursive=true" &> /dev/null
+	curl --connect-timeout 20 --mat-time 10 -s -F file="$DIR/files/go-ipfs-0.4.13" "$replica/api/v0/add?recursive=true"
 	echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 done
 
@@ -110,12 +103,12 @@ pids=()
 WEBPORT=8080
 APIPORT=5001
 clients=1
+HOST="http://localhost:$((WEBPORT))/ipfs"
+API="http://localhost:$((APIPORT))/api/v0"
 {
 	for (( i = 0; i < "$clients"; i++ )); do
-		HOST="http://localhost:$((WEBPORT))/ipfs"
-		API="http://localhost:$((APIPORT))/api/v0"
-		echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API $client"
-		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API $client &
+		echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API 1"
+		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API 1 &
 		pids+=($!)
 	done
 } >> "$DIR/stats.csv"
