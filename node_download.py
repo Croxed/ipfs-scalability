@@ -55,7 +55,7 @@ def scalability_test(IPFS_PATH, HASH, iterations):
     #     with suppress_stdout():
     #         client.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
     # os.environ["IPFS_PATH"] = IPFS_PATH
-    for i in range(0, iterations):
+    for i in range(0, int(iterations)):
         subprocess.Popen("ipfs cat /ipfs/%s &> /dev/null" % HASH)
 
 
