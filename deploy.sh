@@ -51,6 +51,14 @@ done
 echo "Done starting daemons"
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 export IPFS_PATH="$DIR/ipfs_0"
+
+if [ ! -f "$DIR/files/v0.4.13.tar.gz" ]; then
+    wget "https://github.com/ipfs/go-ipfs/archive/v0.4.13.tar.gz" -O "$DIR/files/v0.4.13.tar.gz"
+fi
+
+rm -rf "$DIR/files/go-ipfs-0.4.13"
+tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/go-ipfs-0.4.13"
+
 IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
 unset IPFS_PATH
 
