@@ -57,7 +57,7 @@ if [ ! -f "$DIR/files/v0.4.13.tar.gz" ]; then
 fi
 
 rm -rf "$DIR/files/go-ipfs-0.4.13"
-tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/go-ipfs-0.4.13"
+tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/"
 
 IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
 unset IPFS_PATH

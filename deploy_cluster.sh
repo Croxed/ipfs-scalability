@@ -45,7 +45,7 @@ if [ ! -f "$DIR/files/v0.4.13.tar.gz" ]; then
 fi
 
 rm -rf "$DIR/files/go-ipfs-0.4.13"
-tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/go-ipfs-0.4.13"
+tar -xf "$DIR/files/v0.4.13.tar.gz" -C "$DIR/files/"
 
 API="http://localhost:$((APIPORT + (NODE - 1)))/api/v0"
 IPFS_HASH="$(curl -sF file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
