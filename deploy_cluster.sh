@@ -5,7 +5,7 @@ DEV=lo
 DEV1=enp1s0
 DELAY=50ms
 KBITSPEED=10240 # 100Mbit in Kbit
-NODE=$2
+eval NODE="$2"
 MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
 
 printf "Running... %s \n" "$(date)" > "$DIR/running.txt"
