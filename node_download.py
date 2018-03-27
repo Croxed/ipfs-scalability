@@ -41,22 +41,9 @@ def subprocess_cmd(command):
 
 def scalability_test(IPFS_PATH, HASH, iterations):
     """ Main method for scalability test """
-    # file_list = glob.glob(dir_path + '/clients*.txt')
-    # data = []
-    # frame = pd.DataFrame()
-    # for file_path in file_list:
-    #     data.append(pd.read_csv(file_path))
-    # frame = pd.concat(data)
-    # distribution = frame.sample(len(frame.index) / 8)
-    # for data in distribution:
-    #     pattern = '(?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*'
-    #     match = re.search(pattern, data)
-    #     client = ipfsapi.connect(match.group('host'), int(match.group('port')))
-    #     with suppress_stdout():
-    #         client.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
-    # os.environ["IPFS_PATH"] = IPFS_PATH
+    os.environ["IPFS_PATH"] = IPFS_PATH
     for i in range(0, int(iterations)):
-        subprocess.Popen("ipfs cat /ipfs/%s &> /dev/null" % HASH)
+        subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % HASH)
 
 
 if __name__ == '__main__':

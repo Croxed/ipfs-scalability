@@ -40,7 +40,6 @@ for (( i = 0; i < NODE; i++ )); do
     unset IPFS_PATH
 done
 
-mv "$DIR/client.txt" "$DIR/clients.txt"
 
 STARTED=0
 while((STARTED < NODE)); do
@@ -64,6 +63,7 @@ for (( i = 0; i < NODE; i++ )); do
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
+mv "$DIR/client.txt" "$DIR/clients.txt"
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
 
