@@ -104,10 +104,10 @@ APIPORT=5001
 clients=1
 HOST="http://localhost:$((WEBPORT))/ipfs"
 API="http://localhost:$((APIPORT))/api/v0"
+echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
 {
 	for (( i = 0; i < "$clients"; i++ )); do
-		echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API 1"
-		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API 1 &
+		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients &
 		pids+=($!)
 	done
 } >> "$DIR/stats.csv"
