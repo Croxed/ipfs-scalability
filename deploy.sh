@@ -32,7 +32,7 @@ ipfs config --json Datastore.StorageGCWatermark 0
 ipfs config Datastore.GCPeriod 0h
 ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
 APILIST+=( $((APIPORT + i)) )
-nvim "$IPFS_PATH/config"
+sed -i 's/127.0.0.1/0.0.0.0/g' "$IPFS_PATH/config"
 trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
 echo $! > "$IPFS_PATH/daemon.pid"
 echo "Starting node $i"
@@ -71,7 +71,7 @@ echo "Done bootstrapping $((CLIENTS)) clients.."
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2 | sed "s/127.0.0.1/${MYIP}/")"
 IFS=' ' read -r -a array <<< "$@"
 for cluster in "${array[@]}" ; do
-    ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; hohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1) &'"
+    ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; nohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1) &'"
 done
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
