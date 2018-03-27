@@ -12,6 +12,9 @@ printf "Running... %s \n" "$(date)" > "$DIR/running.txt"
 
 printf "" > "$DIR/client.txt"
 
+pkill ipfs
+pkill ipfs
+
 tc qdisc del dev "$DEV" root netem
 tc qdisc del dev "$DEV1" root netem
 rm -rf "$DIR/ipfs_*"
