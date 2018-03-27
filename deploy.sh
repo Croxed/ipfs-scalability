@@ -92,7 +92,7 @@ inFiles=(clients_*.txt)
 readarray -t myarray < <(cat "${inFiles[@]}")
 
 declare -a replicas
-readarray -t replicas < <(shuf -i0-$((${myarray[@]} - 1)) -n$((${myarray[@]} / 8)))
+readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
 for replica in "${replicas[@]}"; do
 	API="http://localhost:$((APIPORT + replica))/api/v0"
 	curl --connect-timeout 20 --mat-time 10 -s -F file="$DIR/files/go-ipfs-0.4.13" "$API/add?recursive=true" &> /dev/null
