@@ -92,7 +92,7 @@ readarray -t myarray < <(cat "${inFiles[@]}")
 declare -a replicas
 readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
 for replica in "${replicas[@]}"; do
-	curl -s -F file="@files/go-ipfs-0.4.13" "$replica/api/v0/add?recursive=true"
+	curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true"
 	echo "Node: $(curl "$API/id?format=\<id\>" | jq '.ID') is adding files"
 done
 
