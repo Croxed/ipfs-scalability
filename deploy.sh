@@ -86,17 +86,11 @@ for cluster in "${array[@]}" ; do
     done
 done
 
-declare -a myarray
-let i=0
-while IFS=$'\n' read -r line_data; do
-    # Parse “${line_data}” to produce content 
-    # that will be stored in the array.
-    # (Assume content is stored in a variable 
-    # named 'array_element'.)
-    # ...
-    myarray[i]="${array_element}" # Populate array.
-    ((++i))
-done < "$DIR/clients_*"
+
+inFiles=(clients_*.txt)
+
+IFS=$'\n' read -r -d '' -a myarray < \
+  <(printf "%s\n" "${inFiles[@]}" | sed s'/^/out-/')
 
 declare -a replicas
 readarray -t replicas < <(shuf -i0-$((${myarray[@]} - 1)) -n$((${myarray[@]} / 8)))
