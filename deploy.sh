@@ -114,6 +114,7 @@ clients=1
 	for (( i = 0; i < "$clients"; i++ )); do
 		HOST="http://localhost:$((WEBPORT))/ipfs"
 		API="http://localhost:$((APIPORT))/api/v0"
+		echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API $client"
 		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * 3)) $((ITERATIONS / clients)) $API $client &
 		pids+=($!)
 	done
