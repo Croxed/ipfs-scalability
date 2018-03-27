@@ -101,7 +101,7 @@ ITERATIONS=1000
 pids=()
 WEBPORT=8080
 APIPORT=5001
-clients=1
+clients=10
 HOST="http://localhost:$((WEBPORT))/ipfs"
 API="http://localhost:$((APIPORT))/api/v0"
 echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
