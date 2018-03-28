@@ -17,13 +17,13 @@ MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 for NODES in "${CLUSTER_NODES[@]}"; do
 	tc qdisc del dev "$DEV" root netem
 	tc qdisc del dev "$DEV1" root netem
-	rm -rf "$DIR/ipfs_*"
+	rm -rf "$DIR/deploy/ipfs*"
 	APIPORT=5001
 	APILIST=()
 	pids=()
-	rm -rf "$DIR/ipfs_0"
-	mkdir -p "$DIR/ipfs_0"
-	export IPFS_PATH="$DIR/ipfs_0"
+	rm -rf "$DIR/deploy/ipfs0"
+	mkdir -p "$DIR/deploy/ipfs0"
+	export IPFS_PATH="$DIR/deploy/ipfs0"
 	ipfs init -e --profile test &> /dev/null &
 	pids+=($!)
 	ipfs bootstrap rm all &> /dev/null &
@@ -31,7 +31,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	unset IPFS_PATH
 	wait "${pids[@]}"
 
-	export IPFS_PATH="$DIR/ipfs_0"
+	export IPFS_PATH="$DIR/deploy/ipfs0"
 	ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
 	ipfs config Datastore.StorageMax 0GB
 	ipfs config --json Datastore.StorageGCWatermark 0
@@ -56,7 +56,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	done
 	echo "Done starting daemons"
 	NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
-	export IPFS_PATH="$DIR/ipfs_0"
+	export IPFS_PATH="$DIR/deploy/ipfs0"
 
 	unset IPFS_PATH
 
