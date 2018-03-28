@@ -9,7 +9,7 @@ sed -i "1s/.*/time,size,file,nodes,clients/" "$STATS_FILE"
 DEV=lo
 DEV1=enp1s0
 DELAY=50ms
-KBITSPEED=10240 # 100Mbit in Kbit
+KBITSPEED=12800 # 100Mbit in Kbit
 CLIENTS=1
 # NODES=32
 CLUSTER_NODES=(16 32 64)
