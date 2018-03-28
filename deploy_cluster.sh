@@ -14,8 +14,15 @@ printf "" > "$DIR/client.txt"
 
 kill -9 "$(cat "$DIR/daemon.pid")"
 pgrep -f deploy_cluster.sh > "$DIR/daemon.pid"
-pkill ipfs
-pkill ipfs
+
+ipfs_pids="$(find $DIR -name "*.pid")"
+
+readarray -t ipfs_nodes < <(cat "${ipfs_pids[@]}")
+
+for ipfs_node in "${ipfs_nodes[@]}"; do
+    kill -9 "$ipfs_node"
+    wait "$ipfs_node"
+done
 
 tc qdisc del dev "$DEV" root netem
 tc qdisc del dev "$DEV1" root netem
