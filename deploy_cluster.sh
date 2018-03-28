@@ -15,9 +15,9 @@ printf "" > "$DIR/client.txt"
 kill -9 "$(cat "$DIR/daemon.pid")"
 pgrep -f deploy_cluster.sh > "$DIR/daemon.pid"
 
-ipfs_pids="$(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid")"
+# ipfs_pids="$(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid")"
 
-readarray -t ipfs_nodes < <(cat "${ipfs_pids[@]}")
+readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
     kill -9 "$ipfs_node"
