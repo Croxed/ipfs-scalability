@@ -15,7 +15,7 @@ printf "" > "$DIR/client.txt"
 kill -9 "$(cat "$DIR/daemon.pid")"
 pgrep -f deploy_cluster.sh > "$DIR/daemon.pid"
 
-ipfs_pids="$(find $DIR -name "*.pid")"
+ipfs_pids="$(find $DIR/ipfs_* -name "*.pid")"
 
 readarray -t ipfs_nodes < <(cat "${ipfs_pids[@]}")
 
