@@ -21,7 +21,6 @@ readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.p
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
     kill -9 "$ipfs_node"
-    wait "$ipfs_node"
 done
 
 tc qdisc del dev "$DEV" root netem
