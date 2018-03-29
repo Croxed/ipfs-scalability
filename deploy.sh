@@ -85,16 +85,16 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	done
 
 
-	inFiles=(clients_*.txt)
+	# inFiles=(clients_*.txt)
 
-	readarray -t myarray < <(cat "${inFiles[@]}")
+	# readarray -t myarray < <(cat "${inFiles[@]}")
 
-	declare -a replicas
-	readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
-	for replica in "${replicas[@]}"; do
-		IPFS_HASH="$(curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
-		echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
-	done
+	# declare -a replicas
+	# readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
+	# for replica in "${replicas[@]}"; do
+	# 	IPFS_HASH="$(curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
+	# 	echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
+	# done
 
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
 	IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
