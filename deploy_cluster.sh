@@ -20,7 +20,7 @@ pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
 readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
-	kill -9 "$ipfs_node" &> /dev/null
+    kill -9 "$ipfs_node" &> /dev/null
 done
 
 tc qdisc del dev "$DEV" root netem
@@ -30,36 +30,38 @@ APIPORT=5001
 APILIST=()
 pids=()
 for ((i = 0; i < NODE; i++)); do
-	rm -rf "$DIR/ipfs_$i"
-	mkdir -p "$DIR/ipfs_$i"
-	export IPFS_PATH="$DIR/ipfs_$i"
-	ipfs init -e --profile test &>/dev/null &
-	pids+=($!)
-	ipfs bootstrap rm all &>/dev/null &
-	APILIST+=($((APIPORT + i)))
-	unset IPFS_PATH
+    rm -rf "$DIR/ipfs_$i"
+    mkdir -p "$DIR/ipfs_$i"
+    export IPFS_PATH="$DIR/ipfs_$i"
+    ipfs init -e --profile test &>/dev/null &
+    pids+=($!)
+    ipfs bootstrap rm all &>/dev/null &
+    APILIST+=($((APIPORT + i)))
+    unset IPFS_PATH
 done
 wait "${pids[@]}"
 for ((i = 0; i < NODE; i++)); do
-	export IPFS_PATH="$DIR/ipfs_$i"
-	ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-	APILIST+=($((APIPORT + i)))
-	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
-	echo $! >"$IPFS_PATH/daemon.pid"
-	printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >>"$DIR/client.txt"
-	echo "Starting node $i"
-	unset IPFS_PATH
+    export IPFS_PATH="$DIR/ipfs_$i"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
+    ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
+    APILIST+=($((APIPORT + i)))
+    trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
+    echo $! >"$IPFS_PATH/daemon.pid"
+    printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >>"$DIR/client.txt"
+    echo "Starting node $i"
+    unset IPFS_PATH
 done
 
 STARTED=0
 while ((STARTED < NODE)); do
-	STARTED=0
-	for requsts in "${APILIST[@]}"; do
-		if ! curl -fs "http://localhost:$requsts"; then
-			((STARTED++))
-		fi
-	done
-	sleep 1
+    STARTED=0
+    for requsts in "${APILIST[@]}"; do
+        if ! curl -fs "http://localhost:$requsts"; then
+            ((STARTED++))
+        fi
+    done
+    sleep 1
 done
 echo "Done starting daemons"
 NODE_0_ADDR=$1
@@ -67,9 +69,9 @@ NODE_0_ADDR=$1
 echo "${NODE_0_ADDR}"
 
 for ((i = 0; i < NODE; i++)); do
-	API="http://localhost:$((APIPORT + i))/api/v0"
-	curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
-	curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
+    API="http://localhost:$((APIPORT + i))/api/v0"
+    curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
+    curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
