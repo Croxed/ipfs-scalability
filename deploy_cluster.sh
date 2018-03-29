@@ -20,7 +20,7 @@ pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
 readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
-	kill -9 "$ipfs_node" &>/dev/null
+	kill -9 "$ipfs_node" &> /dev/null
 done
 
 tc qdisc del dev "$DEV" root netem
@@ -73,18 +73,6 @@ for ((i = 0; i < NODE; i++)); do
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
-declare -a replicas
-readarray -t replicas < <(shuf -i0-$((NODE - 1)) -n$((NODE / 8)))
-pids=()
-for replica in "${replicas[@]}"; do
-    export IPFS_PATH="$DIR/ipfs_$replica"
-    ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null &
-	pids+=($!)
-    echo "Node $(ipfs id -f \<id\>) is adding files"
-    unset IPFS_PATH
-done
-wait "${pids[@]}"
-echo "Done adding files.."
 mv "$DIR/client.txt" "$DIR/clients.txt"
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
