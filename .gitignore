@@ -2,4 +2,4 @@ files/*
 stats*
 ipfs_*
 nohup.out
-plot.pdf
+*.pdf
