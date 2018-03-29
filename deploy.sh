@@ -36,6 +36,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	ipfs config Datastore.StorageMax 0GB
 	ipfs config --json Datastore.StorageGCWatermark 0
     ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
     ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
 	ipfs config Datastore.GCPeriod 0h
 	ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"

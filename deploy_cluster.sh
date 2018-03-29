@@ -44,6 +44,7 @@ for ((i = 0; i < NODE; i++)); do
     export IPFS_PATH="$DIR/ipfs_$i"
     ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
     ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
     ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
     APILIST+=($((APIPORT + i)))
     trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
