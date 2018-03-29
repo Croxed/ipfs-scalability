@@ -40,7 +40,6 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	APILIST+=( $((APIPORT + i)) )
 	sed -i 's/127.0.0.1/0.0.0.0/g' "$IPFS_PATH/config"
 	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
-    IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n1 | awk '{ print $2 }')"
 	echo $! > "$IPFS_PATH/daemon.pid"
 	echo "Starting node $i"
 	unset IPFS_PATH
@@ -97,8 +96,11 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	# 	echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
 	# done
 
+	export IPFS_PATH="$DIR/deploy/ipfs0"
+    IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n1 | awk '{ print $2 }')"
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
 	IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
+    unset IPFS_PATH
 	ITERATIONS=300
 	pids=()
 	WEBPORT=8080
