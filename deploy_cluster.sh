@@ -75,12 +75,16 @@ echo "Done bootstrapping $((NODE)) nodes.."
 
 declare -a replicas
 readarray -t replicas < <(shuf -i0-$((NODE - 1)) -n$((NODE / 8)))
+pids=()
 for replica in "${replicas[@]}"; do
     export IPFS_PATH="$DIR/ipfs_$replica"
-    ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null
+    ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null &
+	pids+=($!)
     echo "Node $(ipfs id -f \<id\>) is adding files"
     unset IPFS_PATH
 done
+wait "${pids[@]}"
+echo "Done adding files.."
 mv "$DIR/client.txt" "$DIR/clients.txt"
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
