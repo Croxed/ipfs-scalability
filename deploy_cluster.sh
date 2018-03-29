@@ -1,13 +1,6 @@
 #! /usr/bin/env bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-containsElement() {
-	local e match="$1"
-	shift
-	for e; do [[ "$e" == "$match" ]] && return 0; done
-	return 1
-}
-
 DEV=lo
 DEV1=enp1s0
 DELAY=50ms
@@ -47,8 +40,6 @@ for ((i = 0; i < NODE; i++)); do
 	unset IPFS_PATH
 done
 wait "${pids[@]}"
-declare -a replicas
-readarray -t replicas < <(shuf -i0-$((NODE - 1)) -n$((NODE / 8)))
 for ((i = 0; i < NODE; i++)); do
 	export IPFS_PATH="$DIR/ipfs_$i"
 	ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
@@ -56,10 +47,6 @@ for ((i = 0; i < NODE; i++)); do
 	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
 	echo $! >"$IPFS_PATH/daemon.pid"
 	printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >>"$DIR/client.txt"
-	if containsElement "$i" "${replicas[@]}"; then
-		ipfs add -r "$DIR/files/go-ipfs-0.4.13" &>/dev/null
-		echo "Adding files to node $i"
-	fi
 	echo "Starting node $i"
 	unset IPFS_PATH
 done
@@ -86,6 +73,14 @@ for ((i = 0; i < NODE; i++)); do
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
+declare -a replicas
+readarray -t replicas < <(shuf -i0-$((NODE - 1)) -n$((NODE / 8)))
+for replica in "${replicas[@]}"; do
+    export IPFS_PATH="$DIR/ipfs_$replica"
+    ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null
+    echo "Node $(ipfs id -f \<id\>) is adding files"
+    unset IPFS_PATH
+done
 mv "$DIR/client.txt" "$DIR/clients.txt"
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
 tc qdisc add dev "$DEV1" root netem delay "$DELAY" 20ms distribution normal
