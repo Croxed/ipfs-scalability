@@ -1,11 +1,11 @@
 #! /usr/bin/env bash
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-containsElement () {
-  local e match="$1"
-  shift
-  for e; do [[ "$e" == "$match" ]] && return 0; done
-  return 1
+containsElement() {
+	local e match="$1"
+	shift
+	for e; do [[ "$e" == "$match" ]] && return 0; done
+	return 1
 }
 
 DEV=lo
@@ -27,7 +27,7 @@ pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
 readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
-	kill -9 "$ipfs_node" &> /dev/null
+	kill -9 "$ipfs_node" &>/dev/null
 done
 
 tc qdisc del dev "$DEV" root netem
@@ -56,10 +56,10 @@ for ((i = 0; i < NODE; i++)); do
 	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
 	echo $! >"$IPFS_PATH/daemon.pid"
 	printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >>"$DIR/client.txt"
-    if containsElement "$i" "${replicas[@]}" ; then
-        ipfs add -r "$DIR/files/go-ipfs-0.4.13" &> /dev/null
-        echo "Adding files to node $i"
-    fi
+	if containsElement "$i" "${replicas[@]}"; then
+		ipfs add -r "$DIR/files/go-ipfs-0.4.13" &>/dev/null
+		echo "Adding files to node $i"
+	fi
 	echo "Starting node $i"
 	unset IPFS_PATH
 done
@@ -85,8 +85,6 @@ for ((i = 0; i < NODE; i++)); do
 	curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
 done
 echo "Done bootstrapping $((NODE)) nodes.."
-
-
 
 mv "$DIR/client.txt" "$DIR/clients.txt"
 tc qdisc add dev "$DEV" root netem delay "$DELAY" 20ms distribution normal
