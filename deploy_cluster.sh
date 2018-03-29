@@ -20,7 +20,7 @@ pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
 readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
 for ipfs_node in "${ipfs_nodes[@]}"; do
-	kill -9 "$ipfs_node"
+	kill -9 "$ipfs_node" &> /dev/null
 done
 
 tc qdisc del dev "$DEV" root netem
