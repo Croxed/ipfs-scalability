@@ -60,7 +60,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	echo "Done starting daemons"
 	NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 	export IPFS_PATH="$DIR/deploy/ipfs0"
-
+    IPFS_HASH="$(ipfs add -nr "$DIR/files/go-ipfs-0.4.13" | tail -n 1 | awk '{print $2}')"
 	unset IPFS_PATH
 
 	for (( i = 0; i < CLIENTS; i++ )); do
@@ -94,10 +94,14 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 
 	declare -a replicas
 	readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
-	for replica in "${replicas[@]}"; do
-		IPFS_HASH="$(curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
-		echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
-	done
+	# for replica in "${replicas[@]}"; do
+	# 	IPFS_HASH="$(curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
+	# 	echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
+	# done
+    download_nodes=()
+    for replica in "${replica[@]}"; do
+        download_nodes+="${myarray[replica]}"
+    done
 
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
 	IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
@@ -108,12 +112,15 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	clients=10
 	HOST="http://localhost:$((WEBPORT))/ipfs"
 	API="http://localhost:$((APIPORT))/api/v0"
-	echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
-	{
-		for (( i = 0; i < "$clients"; i++ )); do
-			bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients &
-			pids+=($!)
-		done
-	} >> "$DIR/stats.csv"
-	wait "${pids[@]}"
+    echo "python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS""
+    python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS"
+
+	# echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
+	# {
+	# 	for (( i = 0; i < "$clients"; i++ )); do
+	# 		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients &
+	# 		pids+=($!)
+	# 	done
+	# } >> "$DIR/stats.csv"
+	# wait "${pids[@]}"
 done

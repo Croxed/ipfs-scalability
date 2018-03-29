@@ -15,7 +15,7 @@ import ipfsapi
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file = open(dir_path + "/stats.csv", "a")
-nodes = sys.argv[4:]
+nodes = sys.argv[3:]
 
 
 @contextmanager
@@ -39,7 +39,7 @@ def subprocess_cmd(command):
     file.write(time_string)
 
 
-def scalability_test(ipfs_path, ipfs_hash, iterations):
+def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     with suppress_stdout():
         for node in nodes:
@@ -61,4 +61,4 @@ def scalability_test(ipfs_path, ipfs_hash, iterations):
 
 
 if __name__ == '__main__':
-    scalability_test(sys.argv[1], sys.argv[2], sys.argv[3])
+    scalability_test(sys.argv[1], sys.argv[2])
