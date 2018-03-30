@@ -90,6 +90,8 @@ def scalability_test(nr_nodes, iterations):
     with suppress_stdout():
         # os.environ["IPFS_PATH"] = ipfs_path
         gateway_node = ipfsapi.connect()
+        global IPFS_HASH
+        print(IPFS_HASH)
         for _ in range(0, int(iterations)):
             # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
             start_time = time.time()
