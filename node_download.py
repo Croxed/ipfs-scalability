@@ -7,7 +7,7 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
-from multiprocessing import Process
+import multiprocessing as mp
 from random import randint
 from urllib.parse import urlparse
 
@@ -64,19 +64,18 @@ def subprocess_cmd(command):
 
 
 def upload_files(node):
-        node_url = urlparse(node)  # Parses the given URL
-        print("%s : %s" % node_url.hostname, node_url.port)
-        ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
-        ipfs_node.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
+    node_url = urlparse(node)  # Parses the given URL
+    print("%s : %s" % node_url.hostname, node_url.port)
+    ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
+    ipfs_node.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
 
 
 def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
-    processes = []
     nodes = get_clients()
-    for node in nodes:
-        process = Process(target=upload_files, args=(node))
-        processes.extend(process)
+    processes = [mp.Process(target=upload_files) for node in nodes]
+    for process in processes:
+        process.start()
     for process in processes:
         process.join()
     print("Done adding files to nodes")
