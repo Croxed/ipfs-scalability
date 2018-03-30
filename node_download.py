@@ -18,7 +18,6 @@ import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file = open(os.path.join(dir_path, "stats.csv"), "a")
-IPFS_HASH = ""
 # nodes = sys.argv[3:]
 
 
@@ -70,7 +69,6 @@ def upload_files(node, q):
     print("{}:{}" .format(node_url.hostname, node_url.port))
     ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
     res = ipfs_node.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
-    global IPFS_HASH
     q.put(res[-1]['Hash'])
 
 
@@ -90,14 +88,14 @@ def scalability_test(nr_nodes, iterations):
     print("Done adding files to nodes")
     # os.environ["IPFS_PATH"] = ipfs_path
     gateway_node = ipfsapi.connect()
-    queue.get(0)
+    print(queue.get(0))
     for _ in range(0, int(iterations)):
         # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
         start_time = time.time()
-        gateway_node.get(IPFS_HASH)
+        gateway_node.get(queue.get(0))
         time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
         file.write(time_string)
-        subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
+        subprocess_cmd("rm -rf %{}/{}".format(dir_path, queue.get(0)))
 
 
 if __name__ == '__main__':
