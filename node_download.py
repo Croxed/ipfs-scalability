@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Script to run simulation tests on IPFS using ipfsapi and python """
 
+import glob
 import os
 import subprocess
 import sys
@@ -9,7 +10,6 @@ from contextlib import contextmanager
 from random import randint
 from threading import Thread
 from urllib.parse import urlparse
-import glob
 
 import ipfsapi
 # import numpy as np
@@ -40,8 +40,9 @@ def get_clients():
     selected_nodes = []
     size = concatenated_df.shape[0]
     for _ in range(0, int(concatenated_df.shape[0] / 8)):
-        selected_nodes.extend(concatenated_df.drop[randint(0, size)])
-        size = size - 1
+        selected_nodes.extend(
+            concatenated_df.drop(concatenated_df.index[randint(0, size)]))
+        size -= 1
     return selected_nodes
 
 
@@ -63,8 +64,7 @@ def scalability_test(ipfs_hash, iterations):
         ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
         thread = Thread(
             target=ipfs_node.add(
-                dir_path + '/files/go-ipfs-0.4.13',
-                recursive=True)).start()
+                dir_path + '/files/go-ipfs-0.4.13', recursive=True)).start()
         threads.extend(thread)
     for thread in threads:
         thread.join()
