@@ -73,11 +73,13 @@ def upload_files(node):
 def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     nodes = get_clients()
-    processes = [mp.Process(target=upload_files) for node in nodes]
-    for process in processes:
-        process.start()
-    for process in processes:
-        process.join()
+    with mp.Pool(processes=len(nodes)) as pool:
+        results = pool.starmap(upload_files, nodes)
+    print(results)
+    # for process in processes:
+    #     process.start()
+    # for process in processes:
+    #     process.join()
     print("Done adding files to nodes")
     with suppress_stdout():
         # os.environ["IPFS_PATH"] = ipfs_path
