@@ -6,16 +6,18 @@ import subprocess
 import sys
 import time
 from contextlib import contextmanager
+from random import randint
 from threading import Thread
 from urllib.parse import urlparse
+import glob
 
 import ipfsapi
 # import numpy as np
-# import pandas as pd
+import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file = open(dir_path + "/stats.csv", "a")
-nodes = sys.argv[3:]
+# nodes = sys.argv[3:]
 
 
 @contextmanager
@@ -30,6 +32,19 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 
+def get_clients():
+    """ Extract all clients from the .csv files """
+    all_files = glob.glob(os.path.join(dir_path, "clients*.txt"))
+    df_from_each_file = (pd.read_csv(f) for f in all_files)
+    concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
+    selected_nodes = []
+    size = concatenated_df.shape[0]
+    for _ in range(0, concatenated_df.shape[0] / 8):
+        selected_nodes.extend(concatenated_df.drop[randint(0, size)])
+        size = size - 1
+    return selected_nodes
+
+
 def subprocess_cmd(command):
     """ Runs command as subprocess """
     start_time = time.time()
@@ -42,7 +57,7 @@ def subprocess_cmd(command):
 def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     threads = []
-    # with suppress_stdout():
+    nodes = get_clients()
     for node in nodes:
         node_url = urlparse(node)  # Parses the given URL
         ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)

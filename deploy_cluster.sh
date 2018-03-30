@@ -10,7 +10,7 @@ MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 rm -rf "$DIR/clients.txt"
 printf "Running... %s \n" "$(date)" >"$DIR/running.txt"
 
-printf "" >"$DIR/client.txt"
+printf "client\n" >"$DIR/client.txt"
 
 kill -9 "$(cat "$DIR/daemon.pid")"
 pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
