@@ -100,7 +100,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	# done
     download_nodes=()
     for replica in "${replica[@]}"; do
-        download_nodes+="${myarray[replica]}"
+        download_nodes+="${myarray[$replica]}"
     done
 
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
