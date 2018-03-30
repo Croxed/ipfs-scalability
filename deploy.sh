@@ -97,6 +97,6 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	clients=10
 	HOST="http://localhost:$((WEBPORT))/ipfs"
 	API="http://localhost:$((APIPORT))/api/v0"
-    echo "python3 "$DIR/node_download.py" $NODES $ITERATIONS"
-    python3 "$DIR/node_download.py" "$NODES" "$ITERATIONS"
+    echo "python3 "$DIR/node_download.py" $(("$#" * NODES)) $ITERATIONS"
+    python3 "$DIR/node_download.py" "$(($# * NODES))" "$ITERATIONS"
 done
