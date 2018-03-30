@@ -39,7 +39,7 @@ def get_clients():
     concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
-    for _ in range(0, concatenated_df.shape[0] / 8):
+    for _ in range(0, int(concatenated_df.shape[0] / 8)):
         selected_nodes.extend(concatenated_df.drop[randint(0, size)])
         size = size - 1
     return selected_nodes
@@ -47,11 +47,11 @@ def get_clients():
 
 def subprocess_cmd(command):
     """ Runs command as subprocess """
-    start_time = time.time()
+    # start_time = time.time()
     process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     process.communicate()[0].strip()
-    time_string = str(time.time() - start_time) + "," + nodes + '\n'
-    file.write(time_string)
+    # time_string = str(time.time() - start_time) + "," + nodes + '\n'
+    # file.write(time_string)
 
 
 def scalability_test(ipfs_hash, iterations):
