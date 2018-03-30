@@ -97,6 +97,7 @@ def scalability_test(nr_nodes, iterations):
         time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
         file.write(time_string)
         subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
+        gateway_node.repo_gc()
 
 
 if __name__ == '__main__':
