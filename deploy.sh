@@ -100,7 +100,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	# done
     download_nodes=()
     for replica in "${replica[@]}"; do
-        download_nodes+="${myarray[$replica]}"
+        download_nodes+=("${myarray[$replica]}")
     done
 
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
@@ -112,7 +112,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	clients=10
 	HOST="http://localhost:$((WEBPORT))/ipfs"
 	API="http://localhost:$((APIPORT))/api/v0"
-    echo "python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS""
+    echo "python3 "$DIR/node_download.py" $IPFS_HASH $ITERATIONS ${download_nodes[*]}"
     python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS" "${download_nodes[@]}"
 
 	# echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
