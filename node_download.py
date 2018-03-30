@@ -69,6 +69,7 @@ def scalability_test(ipfs_hash, iterations):
     nodes = get_clients()
     for node in nodes:
         node_url = urlparse(node)  # Parses the given URL
+        print("%s : %s" % node_url.hostname, node_url.port)
         ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
         thread = Thread(
             target=ipfs_node.add(
