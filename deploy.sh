@@ -113,7 +113,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	HOST="http://localhost:$((WEBPORT))/ipfs"
 	API="http://localhost:$((APIPORT))/api/v0"
     echo "python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS""
-    python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS"
+    python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS" "${download_nodes[@]}"
 
 	# echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
 	# {
