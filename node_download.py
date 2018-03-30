@@ -67,4 +67,5 @@ def scalability_test(ipfs_hash, iterations):
 
 
 if __name__ == '__main__':
+    print(nodes)
     scalability_test(sys.argv[1], sys.argv[2])
