@@ -86,18 +86,17 @@ def scalability_test(nr_nodes, iterations):
     for process in processes:
         process.join()
     print("Done adding files to nodes")
-    # os.environ["IPFS_PATH"] = ipfs_path
-    gateway_node = ipfsapi.connect()
+    os.environ["IPFS_PATH"] = os.path.join(dir_path, "deploy", "ipfs0")
     IPFS_HASH = queue.get(0)
     print(IPFS_HASH)
     for _ in range(0, int(iterations)):
         # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
         start_time = time.time()
-        gateway_node.get(IPFS_HASH)
+        subprocess_cmd("ipfs get {}".format(IPFS_HASH))
         time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
         file.write(time_string)
         subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
-        gateway_node.repo_gc()
+        subprocess_cmd("ipfs repo gc")
 
 
 if __name__ == '__main__':
