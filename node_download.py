@@ -95,7 +95,7 @@ def scalability_test(nr_nodes, iterations):
         subprocess_cmd("ipfs get {}".format(IPFS_HASH))
         time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
         file.write(time_string)
-        subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
+        subprocess_cmd("rm -rf {}".format(os.path.join(dir_path, IPFS_HASH)))
         subprocess_cmd("ipfs repo gc")
 
 
