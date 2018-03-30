@@ -75,7 +75,7 @@ def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     nodes = get_clients()
     with mp.Pool(processes=len(nodes)) as pool:
-        results = pool.starmap(upload_files, product(nodes))
+        results = pool.map(upload_files, nodes)
     print(results)
     # for process in processes:
     #     process.start()
