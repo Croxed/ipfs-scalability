@@ -47,8 +47,8 @@ def get_clients():
     size = concatenated_df.shape[0]
     for _ in range(0, int(concatenated_df.shape[0] / 8)):
         index = randint(0, size)
-        print(concatenated_df.at[index])
-        selected_nodes.extend(concatenated_df.at[index])
+        print(concatenated_df.iloc[index])
+        selected_nodes.extend(concatenated_df.iloc[index])
         concatenated_df.drop(concatenated_df.index[index])
         size -= 1
     return selected_nodes
