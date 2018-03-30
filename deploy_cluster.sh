@@ -4,7 +4,8 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEV=lo
 DEV1=enp1s0
 DELAY=50ms
-KBITSPEED=12800 # 100Mbit in Kbit
+# KBITSPEED=12800 # 100Mbit in Kbit
+KBITSPEED=125000
 eval NODE="$2"
 MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
 rm -rf "$DIR/clients.txt"
