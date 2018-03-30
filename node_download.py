@@ -10,6 +10,7 @@ from contextlib import contextmanager
 import multiprocessing as mp
 from random import randint
 from urllib.parse import urlparse
+from itertools import product
 
 import ipfsapi
 # import numpy as np
@@ -74,7 +75,7 @@ def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     nodes = get_clients()
     with mp.Pool(processes=len(nodes)) as pool:
-        results = pool.starmap(upload_files, nodes)
+        results = pool.starmap(upload_files, product(nodes))
     print(results)
     # for process in processes:
     #     process.start()
