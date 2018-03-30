@@ -3,3 +3,7 @@ stats*
 ipfs_*
 nohup.out
 *.pdf
+deploy
+running.txt
+daemon.*
+clients*
