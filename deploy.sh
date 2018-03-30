@@ -88,21 +88,6 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	done
 
 
-	inFiles=(clients_*.txt)
-
-	readarray -t myarray < <(cat "${inFiles[@]}")
-
-	declare -a replicas
-	readarray -t replicas < <(shuf -i0-$((${#myarray[@]} - 1)) -n$((${#myarray[@]} / 8)))
-	# for replica in "${replicas[@]}"; do
-	# 	IPFS_HASH="$(curl -s -F file="@files/go-ipfs-0.4.13" "${myarray[$replica]}/api/v0/add?recursive=true" | jq '.Hash' | cut -d "\"" -f 2)"
-	# 	echo "Node: $(curl "${myarray[$replica]}/api/v0/id?format=\<id\>" | jq '.ID') is adding files"
-	# done
-    download_nodes=()
-    for replica in "${replica[@]}"; do
-        download_nodes+=("${myarray[$replica]}")
-    done
-
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
 	IPFS_FILE_SIZE="$(curl -s http://localhost:5001/api/v0/files/stat?arg="/ipfs/$IPFS_HASH" | jq '.CumulativeSize')"
 	ITERATIONS=300
@@ -112,15 +97,6 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	clients=10
 	HOST="http://localhost:$((WEBPORT))/ipfs"
 	API="http://localhost:$((APIPORT))/api/v0"
-    echo "python3 "$DIR/node_download.py" $IPFS_HASH $ITERATIONS ${download_nodes[*]}"
-    python3 "$DIR/node_download.py" "$IPFS_HASH" "$ITERATIONS" "${download_nodes[@]}"
-
-	# echo "bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients"
-	# {
-	# 	for (( i = 0; i < "$clients"; i++ )); do
-	# 		bash "$DIR/download.sh" $HOST $IPFS_HASH $IPFS_FILE_SIZE $IPFS_FILE $((NODES * ${#array[@]})) $((ITERATIONS / clients)) $API $clients &
-	# 		pids+=($!)
-	# 	done
-	# } >> "$DIR/stats.csv"
-	# wait "${pids[@]}"
+    echo "python3 "$DIR/node_download.py" $NODES $ITERATIONS"
+    python3 "$DIR/node_download.py" "$NODES" "$ITERATIONS"
 done
