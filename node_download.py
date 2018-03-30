@@ -67,7 +67,7 @@ def subprocess_cmd(command):
 def upload_files(node):
     """ Uploads all files to given  """
     node_url = urlparse(node)  # Parses the given URL
-    print("{} : {}" .format(node_url.hostname, node_url.port))
+    print("{}:{}" .format(node_url.hostname, node_url.port))
     ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
     res = ipfs_node.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
     global IPFS_HASH
