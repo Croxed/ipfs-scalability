@@ -18,7 +18,7 @@ import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file = open(os.path.join(dir_path, "stats.csv"), "a")
-IPFS_HASH = None
+IPFS_HASH = 0
 # nodes = sys.argv[3:]
 
 
@@ -87,18 +87,16 @@ def scalability_test(nr_nodes, iterations):
     for process in processes:
         process.join()
     print("Done adding files to nodes")
-    with suppress_stdout():
-        # os.environ["IPFS_PATH"] = ipfs_path
-        gateway_node = ipfsapi.connect()
-        global IPFS_HASH
-        print(IPFS_HASH)
-        for _ in range(0, int(iterations)):
-            # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
-            start_time = time.time()
-            gateway_node.get(IPFS_HASH)
-            time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
-            file.write(time_string)
-            subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
+    # os.environ["IPFS_PATH"] = ipfs_path
+    gateway_node = ipfsapi.connect()
+    print(IPFS_HASH)
+    for _ in range(0, int(iterations)):
+        # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
+        start_time = time.time()
+        gateway_node.get(IPFS_HASH)
+        time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
+        file.write(time_string)
+        subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
 
 
 if __name__ == '__main__':
