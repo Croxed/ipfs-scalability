@@ -35,8 +35,14 @@ def suppress_stdout():
 def get_clients():
     """ Extract all clients from the .csv files """
     all_files = glob.glob(os.path.join(dir_path, "clients*.txt"))
-    df_from_each_file = (pd.read_csv(f) for f in all_files)
-    concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
+    concatenated_df = pd.DataFrame()
+    list = []
+    for file_ in all_files:
+        df = pd.read_csv(file_, index_col=None, header=0)
+        list.append(df)
+    # df_from_each_file = (pd.read_csv(f) for f in all_files)
+    concatenated_df = pd.concat(list)
+    # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
     for _ in range(0, int(concatenated_df.shape[0] / 8)):
