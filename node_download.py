@@ -48,7 +48,6 @@ def get_clients():
     size = concatenated_df.shape[0]
     for _ in range(0, int(concatenated_df.shape[0] / 8)):
         index = randint(0, size)
-        print(concatenated_df.iloc[index])
         selected_nodes.extend(concatenated_df.iloc[index])
         concatenated_df.drop(concatenated_df.index[index])
         size -= 1
@@ -65,6 +64,7 @@ def subprocess_cmd(command):
 
 
 def upload_files(node):
+    """ Uploads all files to given  """
     node_url = urlparse(node)  # Parses the given URL
     print("%s : %s" % node_url.hostname, node_url.port)
     ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
@@ -75,8 +75,7 @@ def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     nodes = get_clients()
     with mp.Pool(processes=len(nodes)) as pool:
-        results = pool.map(upload_files, nodes)
-    print(results)
+        pool.map_async(upload_files, tuple(nodes))
     # for process in processes:
     #     process.start()
     # for process in processes:
