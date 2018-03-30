@@ -42,17 +42,19 @@ def subprocess_cmd(command):
 def scalability_test(ipfs_hash, iterations):
     """ Main method for scalability test """
     threads = []
+    # with suppress_stdout():
+    for node in nodes:
+        node_url = urlparse(node)  # Parses the given URL
+        ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
+        thread = Thread(
+            target=ipfs_node.add(
+                dir_path + '/files/go-ipfs-0.4.13',
+                recursive=True)).start()
+        threads.extend(thread)
+    for thread in threads:
+        thread.join()
+    print("Done adding files to nodes")
     with suppress_stdout():
-        for node in nodes:
-            node_url = urlparse(node)  # Parses the given URL
-            ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
-            thread = Thread(
-                target=ipfs_node.add(
-                    dir_path + '/files/go-ipfs-0.4.13',
-                    recursive=True)).start()
-            threads.extend(thread)
-        for thread in threads:
-            thread.join()
         # os.environ["IPFS_PATH"] = ipfs_path
         gateway_node = ipfsapi.connect()
         for _ in range(0, int(iterations)):
