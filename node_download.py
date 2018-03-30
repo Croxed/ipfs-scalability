@@ -17,7 +17,7 @@ import ipfsapi
 import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-file = open(dir_path + "/stats.csv", "a")
+file = open(os.path.join(dir_path, "stats.csv", "a"))
 # nodes = sys.argv[3:]
 
 
