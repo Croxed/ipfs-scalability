@@ -96,7 +96,7 @@ def scalability_test(nr_nodes, iterations):
             gateway_node.get(IPFS_HASH)
             time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
             file.write(time_string)
-            subprocess_cmd("rm -rf %s/go-ipfs-0.4.13" % dir_path)
+            subprocess_cmd("rm -rf %{}/{}".format(dir_path, IPFS_HASH))
 
 
 if __name__ == '__main__':
