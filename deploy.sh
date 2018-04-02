@@ -3,8 +3,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 STATS_FILE="stats.csv"
 head -n 1 "$DIR/template" > "$DIR/$STATS_FILE"
-touch $STATS_FILE
-sed -i "1s/.*/time,size,file,nodes,clients/" "$STATS_FILE"
+# touch $STATS_FILE
+# sed -i "1s/.*/time,size,file,nodes,clients/" "$STATS_FILE"
 
 DEV=lo
 DEV1=enp1s0
