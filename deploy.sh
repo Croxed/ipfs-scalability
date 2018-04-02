@@ -18,6 +18,8 @@ MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 for NODES in "${CLUSTER_NODES[@]}"; do
 	tc qdisc del dev "$DEV" root netem
 	tc qdisc del dev "$DEV1" root netem
+    umount /ipfs
+    umount /ipns
 	rm -rf "$DIR/deploy/ipfs*"
 	APIPORT=5001
 	APILIST=()
