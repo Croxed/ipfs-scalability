@@ -9,7 +9,7 @@ import sys
 import time
 from contextlib import contextmanager
 from itertools import product
-from random import randint
+import random
 from urllib.parse import urlparse
 
 import ipfsapi
@@ -46,11 +46,9 @@ def get_clients():
     # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
-    for _ in range(0, int(concatenated_df.shape[0] / 8)):
-        index = randint(0, size)
-        selected_nodes.extend(concatenated_df.iloc[index])
-        concatenated_df.drop(concatenated_df.index[index])
-        size -= 1
+    dist = random.sample(range(size), size / 8)
+    for i in dist:
+        selected_nodes.extend(concatenated_df.iloc[i])
     return selected_nodes
 
 
