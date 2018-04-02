@@ -89,6 +89,7 @@ def scalability_test(nr_nodes, iterations):
     IPFS_HASH = queue.get(0)
     print(IPFS_HASH)
     move_path = "/newDir"
+    subprocess_cmd("rm -rf {}".format(move_path))
     for _ in range(0, int(iterations)):
         # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
         start_time = time.time()
