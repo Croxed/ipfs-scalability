@@ -2,15 +2,15 @@
 """ Script to run simulation tests on IPFS using ipfsapi and python """
 
 import glob
+import multiprocessing as mp
 import os
 import subprocess
 import sys
 import time
 from contextlib import contextmanager
-import multiprocessing as mp
+from itertools import product
 from random import randint
 from urllib.parse import urlparse
-from itertools import product
 
 import ipfsapi
 # import numpy as np
@@ -66,7 +66,7 @@ def subprocess_cmd(command):
 def upload_files(node, q):
     """ Uploads all files to given  """
     node_url = urlparse(node)  # Parses the given URL
-    print("{}:{}" .format(node_url.hostname, node_url.port))
+    print("{}:{}".format(node_url.hostname, node_url.port))
     ipfs_node = ipfsapi.connect(node_url.hostname, node_url.port)
     res = ipfs_node.add(dir_path + '/files/go-ipfs-0.4.13', recursive=True)
     q.put(res[-1]['Hash'])
@@ -81,22 +81,24 @@ def scalability_test(nr_nodes, iterations):
         p = mp.Process(target=upload_files, args=(node, queue))
         processes.append(p)
         p.start()
-    # for process in processes:
-    #     process.start()
     for process in processes:
         process.join()
     print("Done adding files to nodes")
+    gateway = ipfsapi.connect('127.0.0.1', 5001)
     os.environ["IPFS_PATH"] = os.path.join(dir_path, "deploy", "ipfs0")
     IPFS_HASH = queue.get(0)
     print(IPFS_HASH)
+    move_path = "/newDir"
     for _ in range(0, int(iterations)):
         # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
         start_time = time.time()
-        subprocess_cmd("ipfs get {}".format(IPFS_HASH))
+        subprocess_cmd("cp -r {} {}".format(
+            os.path.join('/ipfs/', IPFS_HASH), move_path))
         time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
         file.write(time_string)
-        subprocess_cmd("rm -rf {}".format(os.path.join(dir_path, IPFS_HASH)))
-        subprocess_cmd("ipfs repo gc")
+        subprocess_cmd("rm -rf {}".format(move_path))
+        gateway.repo_gc()
+        # subprocess_cmd("ipfs repo gc")
 
 
 if __name__ == '__main__':

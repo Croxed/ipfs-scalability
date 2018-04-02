@@ -43,7 +43,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
 	APILIST+=( $((APIPORT + i)) )
 	sed -i 's/127.0.0.1/0.0.0.0/g' "$IPFS_PATH/config"
-	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
+	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon --mount=true --enable-gc=true > "$IPFS_PATH/daemon.stdout" 2> "$IPFS_PATH/daemon.stderr" &
 	echo $! > "$IPFS_PATH/daemon.pid"
 	echo "Starting node $i"
 	unset IPFS_PATH
