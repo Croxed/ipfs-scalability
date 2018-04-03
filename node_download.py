@@ -111,7 +111,7 @@ def scalability_test(nr_nodes, iterations, file, file_size):
     print(IPFS_HASH)
     nodes = 10
     node_download = []
-    node_iterations = iterations / nodes
+    node_iterations = int(iterations) / int(nodes)
     for node in range(0, int(nodes)):
         p = mp.Process(
             target=download_files,
