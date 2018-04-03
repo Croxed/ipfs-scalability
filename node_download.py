@@ -77,7 +77,7 @@ def upload_files(node, q):
 def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
                    nr_nodes):
     """ Download the given file from IPFS """
-    move_path = "/newDir_{}".format(node)
+    move_path = os.path.join(dir_path, "newDir_{}".format(node))
     subprocess_cmd("rm -rf {}".format(move_path))
     for _ in range(0, int(iterations)):
         subprocess_cmd("mkdir -p {}".format(move_path))

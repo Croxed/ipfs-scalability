@@ -26,7 +26,6 @@ done
 tc qdisc del dev "$DEV" root netem
 tc qdisc del dev "$DEV1" root netem
 rm -rf "$DIR/ipfs_*"
-APIPORT=5001
 APILIST=()
 pids=()
 for ((i = 0; i < NODE; i++)); do
@@ -36,7 +35,6 @@ for ((i = 0; i < NODE; i++)); do
 	ipfs init -e --profile test &>/dev/null &
 	pids+=($!)
 	ipfs bootstrap rm all &>/dev/null &
-	APILIST+=($((APIPORT + i)))
 	unset IPFS_PATH
 done
 wait "${pids[@]}"
@@ -45,11 +43,20 @@ for ((i = 0; i < NODE; i++)); do
 	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
 	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
 	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
-	ipfs config Addresses.API /ip4/0.0.0.0/tcp/"$((APIPORT + i))"
-	APILIST+=($((APIPORT + i)))
+	ipfs config Addresses.API /ip4/0.0.0.0/tcp/0
 	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
 	echo $! >"$IPFS_PATH/daemon.pid"
-	printf "http://%s:%s\n" "$MYIP" "$((APIPORT + i))" >>"$DIR/client.txt"
+    echo "Trying to find API port for node $i"
+    while true; do
+        if grep "API" "$IPFS_PATH/daemon.stdout"; then
+            node_port="$(grep "API" "$IPFS_PATH/daemon.stdout" | awk '{split($5,a,"/"); print a[5] }')"
+            echo "Found API poty for node $i..."
+            APILIST+=( "$node_port" )
+            break
+        fi
+        sleep 1
+    done
+	printf "http://%s:%s\n" "$MYIP" "$node_port" >>"$DIR/client.txt"
 	echo "Starting node $i"
 	unset IPFS_PATH
 done
