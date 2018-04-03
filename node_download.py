@@ -80,8 +80,9 @@ def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
     move_path = "/newDir_{}".format(node)
     subprocess_cmd("rm -rf {}".format(move_path))
     for _ in range(0, int(iterations)):
+        subprocess_cmd("mkdir -p {}".format(move_path))
         start_time = time.time()
-        subprocess_cmd("ipfs get {}".format(ipfs_hash))
+        subprocess_cmd("ipfs get {} -o {}".format(ipfs_hash, move_path))
         time_string = str(time.time(
         ) - start_time) + "," + file_size + "," + file + "," + nr_nodes + '\n'
         lock.acquire()
