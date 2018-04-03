@@ -35,7 +35,7 @@ def suppress_stdout():
 
 def get_clients():
     """ Extract all clients from the .csv files """
-    all_files = glob.glob(os.path.join(dir_path, "clients*.txt"))
+    all_files = glob.glob(os.path.join(dir_path, "clients_*.txt"))
     concatenated_df = pd.DataFrame()
     list = []
     for file_ in all_files:
