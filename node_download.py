@@ -4,12 +4,12 @@
 import glob
 import multiprocessing as mp
 import os
+import random
 import subprocess
 import sys
 import time
 from contextlib import contextmanager
 from itertools import product
-import random
 from urllib.parse import urlparse
 
 import ipfsapi
@@ -70,7 +70,7 @@ def upload_files(node, q):
     q.put(res[-1]['Hash'])
 
 
-def scalability_test(nr_nodes, iterations):
+def scalability_test(nr_nodes, iterations, file, size):
     """ Main method for scalability test """
     nodes = get_clients()
     processes = []
@@ -91,9 +91,9 @@ def scalability_test(nr_nodes, iterations):
     for _ in range(0, int(iterations)):
         # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
         start_time = time.time()
-        subprocess_cmd("cp -r {} {}".format(
-            os.path.join('/ipfs/', IPFS_HASH), move_path))
-        time_string = str(time.time() - start_time) + "," + nr_nodes + '\n'
+        subprocess_cmd("ipfs get {}".format(IPFS_HASH))
+        time_string = str(time.time() - start_time
+                          ) + "," + size + + "," + file + "," + nr_nodes + '\n'
         file.write(time_string)
         file.flush()
         subprocess_cmd("rm -rf {}".format(move_path))
@@ -102,4 +102,4 @@ def scalability_test(nr_nodes, iterations):
 
 
 if __name__ == '__main__':
-    scalability_test(sys.argv[1], sys.argv[2])
+    scalability_test(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
