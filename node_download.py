@@ -16,8 +16,12 @@ import ipfsapi
 # import numpy as np
 import pandas as pd
 
+from filelock import FileLock, Timeout
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
-file_out = open(os.path.join(dir_path, "stats.csv"), "a")
+file_out = os.path.join(dir_path, "stats.csv")
+file_out_lock = os.path.join(dir_path, "stats.csv.lock")
+lock = FileLock(file_out_lock, timeout=2)
 # nodes = sys.argv[3:]
 
 
@@ -70,6 +74,25 @@ def upload_files(node, q):
     q.put(res[-1]['Hash'])
 
 
+def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
+                   nr_nodes):
+    """ Download the given file from IPFS """
+    move_path = "/newDir_{}".format(node)
+    subprocess_cmd("rm -rf {}".format(move_path))
+    for _ in range(0, int(iterations)):
+        start_time = time.time()
+        subprocess_cmd("ipfs get {}".format(ipfs_hash))
+        time_string = str(time.time(
+        ) - start_time) + "," + file_size + "," + file + "," + nr_nodes + '\n'
+        lock.acquire()
+        try:
+            open(file_out, "a").write(time_string)
+        finally:
+            lock.release()
+        subprocess_cmd("rm -rf {}".format(move_path))
+        gateway.repo_gc()
+
+
 def scalability_test(nr_nodes, iterations, file, file_size):
     """ Main method for scalability test """
     nodes = get_clients()
@@ -86,19 +109,18 @@ def scalability_test(nr_nodes, iterations, file, file_size):
     os.environ["IPFS_PATH"] = os.path.join(dir_path, "deploy", "ipfs0")
     IPFS_HASH = queue.get(0)
     print(IPFS_HASH)
-    move_path = "/newDir"
-    subprocess_cmd("rm -rf {}".format(move_path))
-    for _ in range(0, int(iterations)):
-        # subprocess_cmd("ipfs cat /ipfs/%s &> /dev/null" % ipfs_hash)
-        start_time = time.time()
-        subprocess_cmd("ipfs get {}".format(IPFS_HASH))
-        time_string = str(time.time() - start_time
-                          ) + "," + file_size + "," + file + "," + nr_nodes + '\n'
-        file_out.write(time_string)
-        file_out.flush()
-        subprocess_cmd("rm -rf {}".format(move_path))
-        gateway.repo_gc()
-        # subprocess_cmd("ipfs repo gc")
+    nodes = 10
+    node_download = []
+    node_iterations = iterations / nodes
+    for node in range(0, int(nodes)):
+        p = mp.Process(
+            target=download_files,
+            args=(node, node_iterations, gateway, IPFS_HASH, file_size, file,
+                  nr_nodes))
+        node_download.append(p)
+        p.start()
+    for node in node_download:
+        node.join()
 
 
 if __name__ == '__main__':
