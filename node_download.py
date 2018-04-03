@@ -93,7 +93,7 @@ def scalability_test(nr_nodes, iterations, file, size):
         start_time = time.time()
         subprocess_cmd("ipfs get {}".format(IPFS_HASH))
         time_string = str(time.time() - start_time
-                          ) + "," + size + + "," + file + "," + nr_nodes + '\n'
+                          ) + "," + size + "," + file + "," + nr_nodes + '\n'
         file.write(time_string)
         file.flush()
         subprocess_cmd("rm -rf {}".format(move_path))
