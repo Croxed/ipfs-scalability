@@ -46,8 +46,7 @@ def get_clients():
     # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
-    print(size)
-    dist = random.sample(range(size), size / 8)
+    dist = random.sample(range(0, size), int(size / 8))
     for i in dist:
         selected_nodes.extend(concatenated_df.iloc[i])
     return selected_nodes
