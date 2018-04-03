@@ -20,6 +20,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	umount /ipfs
 	umount /ipns
 	rm -rf "$DIR/deploy/ipfs*"
+    rm -rf "$DIR/clients_*"
 	APIPORT=5001
 	APILIST=()
 	pids=()
