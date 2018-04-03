@@ -17,7 +17,7 @@ import ipfsapi
 import pandas as pd
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-file = open(os.path.join(dir_path, "stats.csv"), "a")
+file_out = open(os.path.join(dir_path, "stats.csv"), "a")
 # nodes = sys.argv[3:]
 
 
@@ -94,8 +94,8 @@ def scalability_test(nr_nodes, iterations, file, file_size):
         subprocess_cmd("ipfs get {}".format(IPFS_HASH))
         time_string = str(time.time() - start_time
                           ) + "," + file_size + "," + file + "," + nr_nodes + '\n'
-        file.write(time_string)
-        file.flush()
+        file_out.write(time_string)
+        file_out.flush()
         subprocess_cmd("rm -rf {}".format(move_path))
         gateway.repo_gc()
         # subprocess_cmd("ipfs repo gc")
