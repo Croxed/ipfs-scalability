@@ -46,6 +46,7 @@ def get_clients():
     # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
+    print(size)
     dist = random.sample(range(size), size / 8)
     for i in dist:
         selected_nodes.extend(concatenated_df.iloc[i])
@@ -70,7 +71,7 @@ def upload_files(node, q):
     q.put(res[-1]['Hash'])
 
 
-def scalability_test(nr_nodes, iterations, file, size):
+def scalability_test(nr_nodes, iterations, file, file_size):
     """ Main method for scalability test """
     nodes = get_clients()
     processes = []
@@ -93,7 +94,7 @@ def scalability_test(nr_nodes, iterations, file, size):
         start_time = time.time()
         subprocess_cmd("ipfs get {}".format(IPFS_HASH))
         time_string = str(time.time() - start_time
-                          ) + "," + size + "," + file + "," + nr_nodes + '\n'
+                          ) + "," + file_size + "," + file + "," + nr_nodes + '\n'
         file.write(time_string)
         file.flush()
         subprocess_cmd("rm -rf {}".format(move_path))

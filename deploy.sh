@@ -88,7 +88,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
 	done
 
 	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
-    IPFS_FILE_SIZE="$(du -sh "$DIR/files/go-ipfs-0.4.13" | awk '{ print $2 }')"
+    IPFS_FILE_SIZE="$(du -sh "$DIR/files/go-ipfs-0.4.13" | awk '{ print $1 }')"
 	ITERATIONS=300
 	pids=()
 	WEBPORT=8080
