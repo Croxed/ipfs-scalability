@@ -50,7 +50,7 @@ for ((i = 0; i < NODE; i++)); do
     while true; do
         if grep "API" "$IPFS_PATH/daemon.stdout" &> /dev/null; then
             node_port="$(grep "API" "$IPFS_PATH/daemon.stdout" | awk '{split($5,a,"/"); print a[5] }')"
-            echo "Found API poty for node $i..."
+            echo "Found API port for node $i..."
             APILIST+=( "$node_port" )
             break
         fi
