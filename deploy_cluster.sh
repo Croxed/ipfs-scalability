@@ -12,16 +12,16 @@ printf "Running... %s \n" "$(date)" >"$DIR/running.txt"
 
 printf "client\n" >"$DIR/client.txt"
 
-kill -9 "$(cat "$DIR/daemon.pid")"
-pgrep -f deploy_cluster.sh >"$DIR/daemon.pid"
+kill -9 "$(cat "$DIR/deploy.pid")" &> /dev/null
+echo $$ >"$DIR/deploy.pid"
 
 # ipfs_pids="$(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid")"
 
-readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
+# readarray -t ipfs_nodes < <(find $DIR -mindepth 2 -maxdepth 2 -type f -name "*.pid" -exec cat {} \;)
 
-for ipfs_node in "${ipfs_nodes[@]}"; do
-	kill -9 "$ipfs_node" &>/dev/null
-done
+# for ipfs_node in "${ipfs_nodes[@]}"; do
+# 	kill -9 "$ipfs_node" &>/dev/null
+# done
 
 tc qdisc del dev "$DEV" root netem
 tc qdisc del dev "$DEV1" root netem
@@ -29,6 +29,7 @@ rm -rf "$DIR/ipfs_*"
 APILIST=()
 pids=()
 for ((i = 0; i < NODE; i++)); do
+    echo "$DIR/ipfs_$i"
 	rm -rf "$DIR/ipfs_$i"
 	mkdir -p "$DIR/ipfs_$i"
 	export IPFS_PATH="$DIR/ipfs_$i"
