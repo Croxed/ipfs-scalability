@@ -48,7 +48,7 @@ for ((i = 0; i < NODE; i++)); do
 	echo $! >"$IPFS_PATH/daemon.pid"
     echo "Trying to find API port for node $i"
     while true; do
-        if grep "API" "$IPFS_PATH/daemon.stdout"; then
+        if grep "API" "$IPFS_PATH/daemon.stdout" &> /dev/null; then
             node_port="$(grep "API" "$IPFS_PATH/daemon.stdout" | awk '{split($5,a,"/"); print a[5] }')"
             echo "Found API poty for node $i..."
             APILIST+=( "$node_port" )
