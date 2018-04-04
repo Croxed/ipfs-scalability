@@ -50,50 +50,50 @@ unset IPFS_PATH
 
 STARTED=0
 while ((STARTED < CLIENTS)); do
-	STARTED=0
-	for requsts in "${APILIST[@]}"; do
-		if ! curl -fs "http://localhost:$requsts"; then
-			((STARTED++))
-		fi
-	done
-	sleep 1
+    STARTED=0
+    for requsts in "${APILIST[@]}"; do
+        if ! curl -fs "http://localhost:$requsts"; then
+            ((STARTED++))
+        fi
+    done
+    sleep 1
 done
 echo "Done starting daemons"
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 
 for ((i = 0; i < CLIENTS; i++)); do
-	API="http://localhost:$((APIPORT + i))/api/v0"
-	curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
-	curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
+    API="http://localhost:$((APIPORT + i))/api/v0"
+    curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
+    curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
 done
 echo "Done bootstrapping $((CLIENTS)) clients.."
 NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2 | sed "s/127.0.0.1/${MYIP}/")"
 IFS=' ' read -r -a array <<<"$@"
 for NODES in "${CLUSTER_NODES[@]}"; do
-	rm -rf "$DIR/clients_*"
-	for cluster in "${array[@]}"; do
-		ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; nohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1 & echo $! > /root/ipfs-scalability/daemon.pid) &'"
-	done
-	sleep 2
-	for cluster in "${array[@]}"; do
-		while true; do
-			rm -rf "$DIR/clients_$cluster.txt"
-			if scp root@"$cluster:/root/ipfs-scalability/clients.txt" "$DIR/clients_$cluster.txt" &>/dev/null; then
-				break
-			fi
-			sleep 3
-		done
-	done
+    rm -rf "$DIR/clients_*"
+    for cluster in "${array[@]}"; do
+        ssh -n -f root@"$cluster" bash -c "'(cd /root/ipfs-scalability; nohup bash /root/ipfs-scalability/deploy_cluster.sh $NODE_0_ADDR $NODES > /root/ipfs-scalability/daemon.out 2>&1 & echo $! > /root/ipfs-scalability/daemon.pid) &'"
+    done
+    sleep 2
+    for cluster in "${array[@]}"; do
+        while true; do
+            rm -rf "$DIR/clients_$cluster.txt"
+            if scp root@"$cluster:/root/ipfs-scalability/clients.txt" "$DIR/clients_$cluster.txt" &>/dev/null; then
+                break
+            fi
+            sleep 3
+        done
+    done
 
-	IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
-	IPFS_FILE_SIZE="$(du -sh "$DIR/files/go-ipfs-0.4.13" | awk '{ print $1 }')"
-	ITERATIONS=1000
-	pids=()
-	WEBPORT=8080
-	APIPORT=5001
-	clients=10
-	HOST="http://localhost:$((WEBPORT))/ipfs"
-	API="http://localhost:$((APIPORT))/api/v0"
-	echo "python3 "$DIR/node_download.py" $((${#array[@]} * NODES)) $ITERATIONS $IPFS_FILE $IPFS_FILE_SIZE"
-	python3 "$DIR/node_download.py" "$((${#array[@]} * NODES))" "$ITERATIONS" "$IPFS_FILE" "$IPFS_FILE_SIZE"
+    IPFS_FILE="$(find $DIR/files/* -maxdepth 0 -type d -exec basename {} \;)"
+    IPFS_FILE_SIZE="$(du -sh "$DIR/files/go-ipfs-0.4.13" | awk '{ print $1 }')"
+    ITERATIONS=1000
+    pids=()
+    WEBPORT=8080
+    APIPORT=5001
+    clients=10
+    HOST="http://localhost:$((WEBPORT))/ipfs"
+    API="http://localhost:$((APIPORT))/api/v0"
+    echo "python3 "$DIR/node_download.py" $((${#array[@]} * NODES)) $ITERATIONS $IPFS_FILE $IPFS_FILE_SIZE"
+    python3 "$DIR/node_download.py" "$((${#array[@]} * NODES))" "$ITERATIONS" "$IPFS_FILE" "$IPFS_FILE_SIZE"
 done

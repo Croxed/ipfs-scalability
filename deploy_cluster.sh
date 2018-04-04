@@ -30,23 +30,23 @@ APILIST=()
 pids=()
 for ((i = 0; i < NODE; i++)); do
     echo "$DIR/ipfs_$i"
-	rm -rf "$DIR/ipfs_$i"
-	mkdir -p "$DIR/ipfs_$i"
-	export IPFS_PATH="$DIR/ipfs_$i"
-	ipfs init -e --profile test &>/dev/null &
-	pids+=($!)
-	ipfs bootstrap rm all &>/dev/null &
-	unset IPFS_PATH
+    rm -rf "$DIR/ipfs_$i"
+    mkdir -p "$DIR/ipfs_$i"
+    export IPFS_PATH="$DIR/ipfs_$i"
+    ipfs init -e --profile test &>/dev/null &
+    pids+=($!)
+    ipfs bootstrap rm all &>/dev/null &
+    unset IPFS_PATH
 done
 wait "${pids[@]}"
 for ((i = 0; i < NODE; i++)); do
-	export IPFS_PATH="$DIR/ipfs_$i"
-	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
-	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
-	ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
-	ipfs config Addresses.API /ip4/0.0.0.0/tcp/0
-	trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
-	echo $! >"$IPFS_PATH/daemon.pid"
+    export IPFS_PATH="$DIR/ipfs_$i"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin "[\"*\"]"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials "[\"true\"]"
+    ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods "[\"PUT\", \"POST\", \"GET\"]"
+    ipfs config Addresses.API /ip4/0.0.0.0/tcp/0
+    trickle -s -u "$KBITSPEED" -d "$KBITSPEED" ipfs daemon >"$IPFS_PATH/daemon.stdout" 2>"$IPFS_PATH/daemon.stderr" &
+    echo $! >"$IPFS_PATH/daemon.pid"
     echo "Trying to find API port for node $i"
     while true; do
         if grep "API" "$IPFS_PATH/daemon.stdout" &> /dev/null; then
@@ -57,9 +57,9 @@ for ((i = 0; i < NODE; i++)); do
         fi
         sleep 1
     done
-	printf "http://%s:%s\n" "$MYIP" "$node_port" >>"$DIR/client.txt"
-	echo "Starting node $i"
-	unset IPFS_PATH
+    printf "http://%s:%s\n" "$MYIP" "$node_port" >>"$DIR/client.txt"
+    echo "Starting node $i"
+    unset IPFS_PATH
 done
 
 # STARTED=0
@@ -78,9 +78,9 @@ NODE_0_ADDR=$1
 echo "${NODE_0_ADDR}"
 
 for api_port in "${APILIST[@]}"; do
-	API="http://localhost:$api_port/api/v0"
-	curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
-	curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
+    API="http://localhost:$api_port/api/v0"
+    curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
+    curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
 done
 echo "Done bootstrapping $((NODE)) nodes.."
 
