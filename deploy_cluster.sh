@@ -61,16 +61,16 @@ for ((i = 0; i < NODE; i++)); do
 	unset IPFS_PATH
 done
 
-STARTED=0
-while ((STARTED < NODE)); do
-	STARTED=0
-	for requsts in "${APILIST[@]}"; do
-		if ! curl -fs "http://localhost:$requsts"; then
-			((STARTED++))
-		fi
-	done
-	sleep 1
-done
+# STARTED=0
+# while ((STARTED < NODE)); do
+# 	STARTED=0
+# 	for requsts in "${APILIST[@]}"; do
+# 		if ! curl -fs "http://localhost:$requsts"; then
+# 			((STARTED++))
+# 		fi
+# 	done
+# 	sleep 1
+# done
 echo "Done starting daemons"
 NODE_0_ADDR=$1
 # NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
