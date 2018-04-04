@@ -77,8 +77,8 @@ NODE_0_ADDR=$1
 # NODE_0_ADDR="$(curl -s http://localhost:5001/api/v0/id?format=\<id\> | jq '.Addresses[0]' | cut -d "\"" -f 2)"
 echo "${NODE_0_ADDR}"
 
-for ((i = 0; i < NODE; i++)); do
-	API="http://localhost:$((APIPORT + i))/api/v0"
+for api_port in "${APILIST[@]}"; do
+	API="http://localhost:$api_port/api/v0"
 	curl -sSn "$API/bootstrap/add?arg=${NODE_0_ADDR}" &>/dev/null
 	curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null
 done
