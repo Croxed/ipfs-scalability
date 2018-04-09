@@ -49,7 +49,7 @@ def get_clients(replication):
     # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
-    dist = random.sample(range(0, size), int(size / replication))
+    dist = random.sample(range(0, size), int(size / int(replication)))
     for i in dist:
         selected_nodes.extend(concatenated_df.iloc[i])
     return selected_nodes
