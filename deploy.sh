@@ -11,6 +11,7 @@ DEV1=enp1s0
 # KBITSPEED=12800 # 100Mbit in Kbit
 KBITSPEED=125000
 CLIENTS=1
+REPLICATION=6
 # NODES=32
 CLUSTER_NODES=(16 32 64)
 MYIP="$(ip add | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.*')"
@@ -92,6 +93,6 @@ for NODES in "${CLUSTER_NODES[@]}"; do
     IPFS_FILE_SIZE="$(du -sh "$DIR/files/go-ipfs-0.4.13" | awk '{ print $1 }')"
     ITERATIONS=1000
     pids=()
-    echo "python3 "$DIR/node_download.py" $((${#array[@]} * NODES)) $ITERATIONS $IPFS_FILE $IPFS_FILE_SIZE"
-    python3 "$DIR/node_download.py" "$((${#array[@]} * NODES))" "$ITERATIONS" "$IPFS_FILE" "$IPFS_FILE_SIZE"
+    echo "python3 "$DIR/node_download.py" $((${#array[@]} * NODES)) $ITERATIONS $IPFS_FILE $IPFS_FILE_SIZE $REPLICATION"
+    python3 "$DIR/node_download.py" "$((${#array[@]} * NODES))" "$ITERATIONS" "$IPFS_FILE" "$IPFS_FILE_SIZE" "$REPLICATION"
 done

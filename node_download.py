@@ -15,7 +15,6 @@ from urllib.parse import urlparse
 import ipfsapi
 # import numpy as np
 import pandas as pd
-
 from filelock import FileLock, Timeout
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -37,7 +36,7 @@ def suppress_stdout():
             sys.stdout = old_stdout
 
 
-def get_clients():
+def get_clients(replication):
     """ Extract all clients from the .csv files """
     all_files = glob.glob(os.path.join(dir_path, "clients_*.txt"))
     concatenated_df = pd.DataFrame()
@@ -50,7 +49,7 @@ def get_clients():
     # concatenated_df = pd.concat(df_from_each_file, ignore_index=True)
     selected_nodes = []
     size = concatenated_df.shape[0]
-    dist = random.sample(range(0, size), int(size / 8))
+    dist = random.sample(range(0, size), int(size / replication))
     for i in dist:
         selected_nodes.extend(concatenated_df.iloc[i])
     return selected_nodes
@@ -75,7 +74,7 @@ def upload_files(node, q):
 
 
 def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
-                   nr_nodes):
+                   nr_nodes, replication):
     """ Download the given file from IPFS """
     print("Downloading {} times from node {} ".format(iterations, node))
     move_path = os.path.join(dir_path, "newDir_{}".format(node))
@@ -84,8 +83,10 @@ def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
         subprocess_cmd("mkdir -p {}".format(move_path))
         start_time = time.time()
         subprocess_cmd("ipfs get {} -o {}".format(ipfs_hash, move_path))
-        time_string = str(time.time(
-        ) - start_time) + "," + file_size + "," + file + "," + nr_nodes + '\n'
+        time_string = str(
+            time.time() - start_time
+        ) + "," + file_size + "," + file + "," + nr_nodes + "1/{}".format(
+            replication) + '\n'
         lock.acquire()
         try:
             open(file_out, "a").write(time_string)
@@ -95,9 +96,9 @@ def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
         gateway.repo_gc()
 
 
-def scalability_test(nr_nodes, iterations, file, file_size):
+def scalability_test(nr_nodes, iterations, file, file_size, replication):
     """ Main method for scalability test """
-    nodes = get_clients()
+    nodes = get_clients(replication)
     processes = []
     queue = mp.Queue()
     for node in nodes:
@@ -118,7 +119,7 @@ def scalability_test(nr_nodes, iterations, file, file_size):
         p = mp.Process(
             target=download_files,
             args=(node, node_iterations, gateway, IPFS_HASH, file_size, file,
-                  nr_nodes))
+                  nr_nodes, replication))
         node_download.append(p)
         p.start()
     for node in node_download:
@@ -126,4 +127,5 @@ def scalability_test(nr_nodes, iterations, file, file_size):
 
 
 if __name__ == '__main__':
-    scalability_test(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    scalability_test(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
+                     sys.argv[5])
