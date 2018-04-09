@@ -85,7 +85,7 @@ def download_files(node, iterations, gateway, ipfs_hash, file_size, file,
         subprocess_cmd("ipfs get {} -o {}".format(ipfs_hash, move_path))
         time_string = str(
             time.time() - start_time
-        ) + "," + file_size + "," + file + "," + nr_nodes + "1/{}".format(
+        ) + "," + file_size + "," + file + "," + nr_nodes + "," + "1/{}".format(
             replication) + '\n'
         lock.acquire()
         try:
