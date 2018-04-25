@@ -92,5 +92,6 @@ while : ; do
         stats="$(curl -sSn "$API/stats/bw?")"
         echo "$api_port : $stats" >> "$DIR/stats_bw.log"
     done
+    sleep 2
 done
 cat
