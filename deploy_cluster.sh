@@ -86,6 +86,7 @@ echo "Done bootstrapping $((NODE)) nodes.."
 
 mv "$DIR/client.txt" "$DIR/clients.txt"
 
+printf "" > "$DIR/stats_bw.log"
 while : ; do
     for api_port in "${APILIST[@]}"; do
         API="http://localhost:$api_port/api/v0"
