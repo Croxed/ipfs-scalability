@@ -89,7 +89,7 @@ mv "$DIR/client.txt" "$DIR/clients.txt"
 while : ; do
     for api_port in "${APILIST[@]}"; do
         API="http://localhost:$api_port/api/v0"
-        stats="$(curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null)"
+        stats="$(curl -sSn "$API/stats/bw?")"
         echo "$api_port : $stats" >> "$DIR/stats_bw.log"
     done
 done
