@@ -86,7 +86,7 @@ echo "Done bootstrapping $((NODE)) nodes.."
 
 mv "$DIR/client.txt" "$DIR/clients.txt"
 
-while True; do
+while : ; do
     for api_port in "${APILIST[@]}"; do
         API="http://localhost:$api_port/api/v0"
         stats="$(curl -sSn "$API/swarm/connect?arg=${NODE_0_ADDR}" &>/dev/null)"
