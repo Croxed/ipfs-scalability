@@ -95,4 +95,7 @@ for NODES in "${CLUSTER_NODES[@]}"; do
     pids=()
     echo "python3 "$DIR/node_download.py" $((${#array[@]} * NODES)) $ITERATIONS $IPFS_FILE $IPFS_FILE_SIZE $REPLICATION"
     python3 "$DIR/node_download.py" "$((${#array[@]} * NODES))" "$ITERATIONS" "$IPFS_FILE" "$IPFS_FILE_SIZE" "$REPLICATION"
+    for cluster in "${array[@]}"; do
+        ssh -n -f root@"$cluster" sh -c "'(pkill bash; pkill ipfs; pkill ipfs) &'"
+    done
 done
